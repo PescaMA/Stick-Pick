@@ -13,11 +13,14 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
+use avian2d::{PhysicsPlugins, prelude::Gravity};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use crate::{AppSystems, PausableSystems};
 
 pub(super) fn plugin(app: &mut App) {
+    app.insert_resource(Gravity(Vec2::new(0.0, -800.0)));
+    // app.add_plugins(PhysicsPlugins::default());
     app.add_systems(
         Update,
         (apply_movement, apply_screen_wrap)

@@ -1,14 +1,13 @@
 //! Spawn the main level.
 
-use bevy::prelude::*;
-use bevy_firefly::prelude::Occluder2d;
-
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
     game::player::{PlayerAssets, player},
     screens::Screen,
 };
+use bevy::prelude::*;
+use bevy_map::MapHandle;
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<LevelAssets>();
@@ -35,23 +34,23 @@ pub fn spawn_level(
     mut commands: Commands,
     level_assets: Res<LevelAssets>,
     player_assets: Res<PlayerAssets>,
+    asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     commands.spawn((
-        Name::new("Level"),
-        Transform::default(),
-        Visibility::default(),
-        DespawnOnExit(Screen::Gameplay),
-        children![
-            player(400.0, &player_assets, &mut texture_atlas_layouts),
-            (
-                Name::new("Gameplay Music"),
-                music(level_assets.music.clone())
-            ),
-            (
-                Occluder2d::circle(20.0),
-                Transform::from_translation(vec3(0., 0., 0.))
-            )
-        ],
+        (
+            Name::new("Level"),
+            Transform::default(),
+            Visibility::default(),
+            DespawnOnExit(Screen::Gameplay),
+            children![
+                player(400.0, &player_assets, &mut texture_atlas_layouts),
+                (
+                    Name::new("Gameplay Music"),
+                    music(level_assets.music.clone())
+                ),
+            ],
+        ),
+        MapHandle(asset_server.load("licenta_jam.map.json")),
     ));
 }

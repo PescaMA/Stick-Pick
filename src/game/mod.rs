@@ -5,11 +5,18 @@
 
 use bevy::prelude::*;
 
+use crate::game::generated::GeneratedPlugin;
+
 mod animation;
 mod camera;
+mod generated;
 pub mod level;
 mod movement;
 pub mod player;
+
+const SPRITE_SOURCE_PX: f32 = 16.0;
+const SPRITE_TARGET_PX: f32 = 32.0;
+const SPRITE_SCALE: f32 = SPRITE_TARGET_PX / SPRITE_SOURCE_PX;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -18,5 +25,6 @@ pub(super) fn plugin(app: &mut App) {
         movement::plugin,
         player::plugin,
         camera::plugin,
+        GeneratedPlugin,
     ));
 }

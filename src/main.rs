@@ -3,7 +3,6 @@
 // Disable console on Windows for non-dev builds.
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
-
 mod asset_tracking;
 mod audio;
 #[cfg(feature = "dev")]
@@ -14,6 +13,7 @@ mod screens;
 mod theme;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy_map::{MapCollisionPlugin, MapRuntimePlugin};
 
 fn main() -> AppExit {
     App::new().add_plugins(AppPlugin).run()
@@ -42,6 +42,8 @@ impl Plugin for AppPlugin {
                     .into(),
                     ..default()
                 }),
+            MapRuntimePlugin,
+            MapCollisionPlugin,
         ));
 
         // Add other plugins.
@@ -70,7 +72,6 @@ impl Plugin for AppPlugin {
         // Set up the `Pause` state.
         app.init_state::<Pause>();
         app.configure_sets(Update, PausableSystems.run_if(in_state(Pause(false))));
-
     }
 }
 

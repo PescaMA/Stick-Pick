@@ -1,5 +1,6 @@
 //! Player-specific behavior.
 
+use avian2d::prelude::*;
 use bevy::{
     image::{ImageLoaderSettings, ImageSampler},
     prelude::*,
@@ -10,10 +11,14 @@ use crate::{
     AppSystems, PausableSystems,
     asset_tracking::LoadResource,
     game::{
+        SPRITE_SCALE,
         animation::PlayerAnimation,
         movement::{MovementController, ScreenWrap},
     },
 };
+
+const PLAYER_SPRITE_SIZE: f32 = 32.;
+pub const PLAYER_SPAWN_POSITION: Vec3 = vec3(100., 30., 1.);
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<PlayerAssets>();
@@ -49,7 +54,7 @@ pub fn player(
                 index: player_animation.get_atlas_index(),
             },
         ),
-        Transform::from_scale(Vec2::splat(8.0).extend(1.0)),
+        Transform::from_scale(Vec2::splat(SPRITE_SCALE).extend(1.0)),
         MovementController {
             max_speed,
             ..default()
@@ -57,11 +62,23 @@ pub fn player(
         ScreenWrap,
         player_animation,
         PointLight2d {
-            color: Color::srgb(1.0, 0.0, 0.0),
-            range: 100.0,
-            intensity: 1.0,
+            // for firefly lighting
+            color: Color::srgb(0.2, 0.0, 1.0),
+            range: PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.,
+            intensity: 4.0,
             ..default()
         },
+        (
+            RigidBody::Dynamic, // affected by gravity/colissions
+            // Capsule prevents catching on tile edges
+            Collider::capsule(7.0, 8.0),
+            CollisionLayers::from_bits(1, 1), // we are in layer 1 and collide with layer 1
+            LockedAxes::ROTATION_LOCKED,
+            Friction::new(0.1),
+            Restitution::new(0.0), // bounciness. 1 = perfectly elastic, 0 = no
+            LinearVelocity::ZERO,  // start stationary
+            CollidingEntities::default(), // track collisions
+        ),
     )
 }
 

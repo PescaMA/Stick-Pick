@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Bevy App</title>
+  <style>
+    body { margin: 0; background: #111; color: white; }
+    canvas { display: block; margin: auto; }
+  </style>
+</head>
+<body>
+  <script type="module">
+    function showWebGPUMessage() {
+      document.body.innerHTML = `
+        <div style="
+          font-family: system-ui, sans-serif;
+          padding: 2rem;
+          max-width: 600px;
+          margin: 10vh auto;
+          text-align: center;
+        ">
+          <h1>WebGPU Required</h1>
+          <p>This app needs WebGPU, but your browser doesn’t support or have it enabled.</p>
+          <p>Try the latest Chrome or Edge and enable WebGPU in browser flags.</p>
+        </div>
+      `;
+    }
+
+    async function startApp() {
+      const wasm = await import("./pkg/YOUR_CRATE_NAME.js");
+      await wasm.default();
+    }
+
+    if (!navigator.gpu) {
+      showWebGPUMessage();
+    } else {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) {
+        showWebGPUMessage();
+      } else {
+        startApp();
+      }
+    }
+  </script>
+</body>
+</html>
+

@@ -1,11 +1,12 @@
 //! Spawn the main level.
 
 use bevy::prelude::*;
+use bevy_firefly::prelude::Occluder2d;
 
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
-    demo::player::{PlayerAssets, player},
+    game::player::{PlayerAssets, player},
     screens::Screen,
 };
 
@@ -46,6 +47,10 @@ pub fn spawn_level(
             (
                 Name::new("Gameplay Music"),
                 music(level_assets.music.clone())
+            ),
+            (
+                Occluder2d::circle(20.0),
+                Transform::from_translation(vec3(0., 0., 0.))
             )
         ],
     ));

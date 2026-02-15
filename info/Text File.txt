@@ -1,0 +1,14 @@
+to make it work on web (firefly):
+ - enabled firefox dom.webgpu.enabled in about:config. Added index.html to warn that webgpu isnt enabled.
+ - updated Mesa drivers: Mesa 23.2.1-1ubuntu3.1~22.04.3 -> Mesa 25.0.7 - kisak-mesa PPA
+ 	(glxinfo | grep "OpenGL version"
+	sudo add-apt-repository ppa:kisak/turtle -y)
+ - added in cargo.toml features to bevy: bevy = { version = "0.18", features = ["webgpu","web"] }
+	(after     Finished `web` profile [optimized + debuginfo] target(s) in 16m 53s) it WORKED.
+
+now i get: [Invalid RenderPipeline "sprite_stencil_pipeline"] is invalid.
+ - While encoding [RenderPassEncoder "stencil pass"].SetPipeline([Invalid RenderPipeline "sprite_stencil_pipeline"]).
+ - While finishing [CommandEncoder (unlabeled)].
+Understand this warning
+249[Invalid CommandBuffer] is invalid.
+ - While calling [Queue].Submit([[CommandBuffer], [CommandBuffer "main_opaque_pass_2d_command_encoder" from CommandEncoder "main_opaque_pass_2d_command_encoder"], [CommandBuffer "main_transparent_pass_2d_command_encoder" from CommandEncoder "main_transparent_pass_2d_command_encoder"], [Invalid CommandBuffer]])

@@ -4,11 +4,12 @@ use bevy::{
     image::{ImageLoaderSettings, ImageSampler},
     prelude::*,
 };
+use bevy_firefly::prelude::*;
 
 use crate::{
     AppSystems, PausableSystems,
     asset_tracking::LoadResource,
-    demo::{
+    game::{
         animation::PlayerAnimation,
         movement::{MovementController, ScreenWrap},
     },
@@ -42,7 +43,7 @@ pub fn player(
         Name::new("Player"),
         Player,
         Sprite::from_atlas_image(
-            player_assets.ducky.clone(),
+            player_assets.image.clone(),
             TextureAtlas {
                 layout: texture_atlas_layout,
                 index: player_animation.get_atlas_index(),
@@ -55,12 +56,18 @@ pub fn player(
         },
         ScreenWrap,
         player_animation,
+        PointLight2d {
+            color: Color::srgb(1.0, 0.0, 0.0),
+            range: 100.0,
+            intensity: 1.0,
+            ..default()
+        },
     )
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
-struct Player;
+pub struct Player;
 
 fn record_player_directional_input(
     input: Res<ButtonInput<KeyCode>>,
@@ -95,23 +102,23 @@ fn record_player_directional_input(
 #[reflect(Resource)]
 pub struct PlayerAssets {
     #[dependency]
-    ducky: Handle<Image>,
+    image: Handle<Image>,
     #[dependency]
-    pub steps: Vec<Handle<AudioSource>>,
+    pub throw_sound: Vec<Handle<AudioSource>>,
 }
 
 impl FromWorld for PlayerAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();
         Self {
-            ducky: assets.load_with_settings(
+            image: assets.load_with_settings(
                 "images/ducky.png",
                 |settings: &mut ImageLoaderSettings| {
                     // Use `nearest` image sampling to preserve pixel art style.
                     settings.sampler = ImageSampler::nearest();
                 },
             ),
-            steps: vec![
+            throw_sound: vec![
                 assets.load("audio/sound_effects/step1.ogg"),
                 assets.load("audio/sound_effects/step2.ogg"),
                 assets.load("audio/sound_effects/step3.ogg"),

@@ -5,7 +5,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = { version = "0.18" }
+avian2d = "0.5.0"
+bevy = { version = "0.18", features = ["webgpu","web"] }
+bevy-inspector-egui = "0.36.0"
+bevy_firefly = "0.18.0"
 rand = "0.9"
 # Compile out low-severity logs to improve performance.
 # Remove these features if you want to profile your game with tracy.
@@ -76,6 +79,8 @@ nonstandard_macro_braces = "warn"
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]
 opt-level = 1
+incremental = true
+codegen-units = 256
 
 # Enable a large amount of optimization in the dev profile for dependencies.
 [profile.dev.package."*"]

@@ -1,0 +1,8 @@
+    Finished `dev` profile [optimized + debuginfo] target(s) in 32m 07s. 18.72s for app main
+    Finished `web` profile [optimized + debuginfo] target(s) in 26m 49s. 35.31s for app main
+
+
+
+   Compiling bevy_map_editor v0.5.0
+    Finished `release` profile [optimized] target(s) in 21m 52s
+

@@ -73,9 +73,9 @@ pub fn player(
             // Capsule prevents catching on tile edges
             Collider::capsule(7.0, 8.0),
             CollisionLayers::from_bits(1, 1), // we are in layer 1 and collide with layer 1
-            LockedAxes::ROTATION_LOCKED,
+            // LockedAxes::ROTATION_LOCKED,
             Friction::new(0.1),
-            Restitution::new(0.0), // bounciness. 1 = perfectly elastic, 0 = no
+            Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
             LinearVelocity::ZERO,  // start stationary
             CollidingEntities::default(), // track collisions
         ),

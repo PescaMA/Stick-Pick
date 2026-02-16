@@ -8,6 +8,7 @@ edition = "2024"
 avian2d = "0.5.0"
 bevy = { version = "0.18", features = ["webgpu","web"] }
 bevy-inspector-egui = "0.36.0"
+bevy_ecs_tilemap = "0.18.1"
 bevy_firefly = "0.18.0"
 bevy_map = {version = "0.5", features = ["physics"]}
 rand = "0.9"

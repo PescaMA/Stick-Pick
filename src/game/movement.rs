@@ -13,8 +13,9 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
-use avian2d::{PhysicsPlugins, prelude::Gravity};
+use avian2d::prelude::Gravity;
 use bevy::{prelude::*, window::PrimaryWindow};
+use bevy_map::runtime::CameraBounds;
 
 use crate::{AppSystems, PausableSystems};
 
@@ -23,7 +24,7 @@ pub(super) fn plugin(app: &mut App) {
     // app.add_plugins(PhysicsPlugins::default());
     app.add_systems(
         Update,
-        (apply_movement, apply_screen_wrap)
+        (apply_movement, apply_screen_wrap, apply_level_wrap)
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
@@ -72,11 +73,34 @@ fn apply_screen_wrap(
     window: Single<&Window, With<PrimaryWindow>>,
     mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
 ) {
-    let size = window.size() + 256.0;
+    let size = window.size() + 32.0;
     let half_size = size / 2.0;
     for mut transform in &mut wrap_query {
         let position = transform.translation.xy();
         let wrapped = (position + half_size).rem_euclid(size) - half_size;
         transform.translation = wrapped.extend(transform.translation.z);
+    }
+}
+
+fn apply_level_wrap(
+    mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
+    level_bounds: Query<&CameraBounds>,
+) {
+    for level_bound in &level_bounds {
+        let size = level_bound.max - level_bound.min + 2.0 * level_bound.padding;
+        for mut transform in &mut wrap_query {
+            let mut result = transform.translation.xy();
+            if result.y < level_bound.min.y {
+                result.y = 100.;
+            }
+            if result.x < level_bound.min.x {
+                result.x += size.x;
+            }
+            if result.x > level_bound.max.x {
+                result.x -= size.x;
+            }
+
+            transform.translation = result.extend(transform.translation.z);
+        }
     }
 }

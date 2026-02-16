@@ -1,4 +1,7 @@
-use crate::game::player::{PLAYER_SPAWN_POSITION, Player};
+use crate::game::{
+    SPRITE_SCALE,
+    player::{PLAYER_SPAWN_POSITION, Player},
+};
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use bevy_firefly::prelude::*;
@@ -14,7 +17,15 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn_camera(mut commands: Commands) {
-    commands.spawn((Name::new("Camera"), Camera2d, FireflyConfig::default()));
+    commands.spawn((
+        Name::new("Camera"),
+        Projection::Orthographic(OrthographicProjection {
+            scale: 1.0 / SPRITE_SCALE,
+            ..OrthographicProjection::default_2d()
+        }),
+        Camera2d,
+        FireflyConfig::default(),
+    ));
 }
 
 fn update_camera(
@@ -37,7 +48,7 @@ fn resize_system(
     windows: Query<&Window, With<PrimaryWindow>>,
     mut q_camera: Query<&mut Transform, With<Camera>>,
 ) {
-    let window = windows.iter().nth(0).unwrap();
+    let window = windows.single().unwrap();
     let win_w = window.width();
     let win_h = window.height();
 

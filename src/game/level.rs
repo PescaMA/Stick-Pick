@@ -7,10 +7,15 @@ use crate::{
     screens::Screen,
 };
 use bevy::prelude::*;
-use bevy_map::MapHandle;
+use bevy_ecs_tilemap::{map::TilemapId, tiles::TilePos};
+use bevy_map::{
+    MapHandle, MapRoot, SpawnMapEvent,
+    runtime::{MapLayerIndex, bevy_map_core},
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<LevelAssets>();
+    app.add_systems(Update, name_tiles_on_spawn);
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -51,6 +56,20 @@ pub fn spawn_level(
                 ),
             ],
         ),
-        MapHandle(asset_server.load("licenta_jam.map.json")),
+        MapHandle(asset_server.load("maps/licenta_jam.map.json")),
     ));
+}
+
+pub fn name_tiles_on_spawn(
+    mut commands: Commands,
+    added_tiles: Query<(Entity, &TilemapId), Added<TilePos>>,
+    layer: Query<&MapLayerIndex>,
+) {
+    for (entity, childof) in added_tiles {
+        let parent = childof.0;
+        if layer.get(parent).is_ok() {
+            let name = layer.get(parent).unwrap().0;
+            commands.entity(entity).insert(Name::new(name.to_string()));
+        }
+    }
 }

@@ -3765,6 +3765,7 @@ dependencies = [
  "avian2d",
  "bevy",
  "bevy-inspector-egui",
+ "bevy_ecs_tilemap",
  "bevy_firefly",
  "bevy_map",
  "getrandom 0.3.4",

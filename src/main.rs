@@ -43,7 +43,7 @@ impl Plugin for AppPlugin {
                     ..default()
                 }),
             MapRuntimePlugin,
-            MapCollisionPlugin,
+            MapCollisionPlugin, // also adds PhysicsPlugins::default());
         ));
 
         // Add other plugins.

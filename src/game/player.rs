@@ -26,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
     // Record directional input as movement controls.
     app.add_systems(
         Update,
-        record_player_directional_input
+        (record_player_directional_input, apply_impulse_on_x)
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
     );
@@ -72,12 +72,13 @@ pub fn player(
             RigidBody::Dynamic, // affected by gravity/colissions
             // Capsule prevents catching on tile edges
             Collider::capsule(7.0, 8.0),
-            CollisionLayers::from_bits(1, 1), // we are in layer 1 and collide with layer 1
+            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
             // LockedAxes::ROTATION_LOCKED,
             Friction::new(0.1),
             Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
             LinearVelocity::ZERO,  // start stationary
             CollidingEntities::default(), // track collisions
+            GravityScale(1.0),
         ),
     )
 }
@@ -112,6 +113,22 @@ fn record_player_directional_input(
     // Apply movement intent to controllers.
     for mut controller in &mut controller_query {
         controller.intent = intent;
+    }
+}
+
+fn apply_impulse_on_x(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut query: Query<(&mut LinearVelocity, &mut AngularVelocity), With<Player>>,
+) {
+    if !keyboard.just_pressed(KeyCode::KeyX) {
+        return;
+    }
+
+    for (mut linear_velocity, mut angular_velocity) in &mut query {
+        linear_velocity.x += 200.0;
+        linear_velocity.x += 200.0;
+
+        angular_velocity.0 += 0.5;
     }
 }
 

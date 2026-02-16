@@ -13,18 +13,26 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
-use avian2d::prelude::Gravity;
+use avian2d::prelude::{CollidingEntities, Gravity, GravityScale};
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_map::runtime::CameraBounds;
 
-use crate::{AppSystems, PausableSystems};
+use crate::{AppSystems, PausableSystems, game::player::Player};
+
+const STICKY_LAYER: usize = 1;
+const SOLID_LAYER: usize = 0;
 
 pub(super) fn plugin(app: &mut App) {
     app.insert_resource(Gravity(Vec2::new(0.0, -800.0)));
     // app.add_plugins(PhysicsPlugins::default());
     app.add_systems(
         Update,
-        (apply_movement, apply_screen_wrap, apply_level_wrap)
+        (
+            apply_movement,
+            apply_screen_wrap,
+            apply_level_wrap,
+            collide_sticky,
+        )
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
@@ -68,6 +76,29 @@ fn apply_movement(
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct ScreenWrap;
+
+fn collide_sticky(
+    mut query: Query<(Entity, &CollidingEntities, &mut GravityScale), With<Player>>,
+    names: Query<&Name>,
+) {
+    for (_, colliding_entities, mut gravity) in query.iter_mut() {
+        gravity.0 = 1.0;
+        for colide in colliding_entities.iter() {
+            if names.get(*colide).is_err() {
+                continue;
+            }
+
+            let name = names.get(*colide).unwrap().as_str();
+
+            // info!("thy name is {name}. maybe {STICKY_LAYER}");
+
+            if name == STICKY_LAYER.to_string() {
+                // info!("touching sticky");
+                gravity.0 = 0.0;
+            }
+        }
+    }
+}
 
 fn apply_screen_wrap(
     window: Single<&Window, With<PrimaryWindow>>,

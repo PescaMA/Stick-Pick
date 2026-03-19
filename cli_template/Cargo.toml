@@ -1,0 +1,10 @@
+[package]
+name = "cli_template"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+engine = { version = "0.1.0", path = "../engine" }
+# Only include non-Bevy crates here if needed. Do NOT add bevy = "..." here.
+ldtk = { version = "0.4.0", features = ["ldtk-v0-9-3"], optional = true }
+rand = { version = "0.9", optional = true }

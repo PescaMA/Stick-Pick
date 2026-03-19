@@ -2154,6 +2154,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cli_template"
+version = "0.1.0"
+dependencies = [
+ "engine",
+ "ldtk",
+ "rand 0.9.2",
+]
+
+[[package]]
 name = "clipboard-win"
 version = "5.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2680,6 +2689,22 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "engine"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy_ecs_ldtk",
+ "bevy_ecs_tilemap",
+ "bevy_firefly",
+ "bevy_map",
+ "getrandom 0.3.4",
+ "ldtk",
+ "rand 0.9.2",
+ "tracing",
 ]
 
 [[package]]
@@ -3842,17 +3867,9 @@ dependencies = [
 name = "my_bevy_app"
 version = "0.1.0"
 dependencies = [
- "avian2d",
- "bevy",
- "bevy-inspector-egui",
- "bevy_ecs_ldtk",
- "bevy_ecs_tilemap",
- "bevy_firefly",
- "bevy_map",
+ "cli_template",
+ "engine",
  "getrandom 0.3.4",
- "ldtk",
- "rand 0.9.2",
- "tracing",
 ]
 
 [[package]]

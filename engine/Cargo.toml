@@ -1,0 +1,66 @@
+[package]
+name = "engine"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bevy = { version = "0.18", features = ["webgpu", "web"] }
+bevy_ecs_ldtk = "0.14.0"
+bevy-inspector-egui = "0.36.0"
+bevy_ecs_tilemap = "0.18.1"
+bevy_firefly = "0.18.0"
+bevy_map = { version = "0.5", features = ["physics"] }
+
+# Optional: re-export commonly used crates/types here
+ldtk = { version = "0.4.0", features = ["ldtk-v0-9-3"], optional = true }
+rand = { version = "0.9", optional = true }
+tracing = { version = "0.1", features = ["max_level_debug","release_max_level_warn"], optional = true }
+
+[target.wasm32-unknown-unknown.dependencies]
+getrandom = { version = "0.3", features = ["wasm_js"] }
+
+[features]
+# Default to a native dev build.
+default = ["dev_native"]
+dev = [
+    # Improve compile times for dev builds by linking Bevy as a dynamic library.
+    "bevy/dynamic_linking",
+    "bevy/bevy_dev_tools",
+    "bevy/bevy_ui_debug",
+    # Improve error messages coming from Bevy
+    "bevy/track_location",
+]
+dev_native = [
+    "dev",
+    # Enable asset hot reloading for native dev builds.
+    "bevy/file_watcher",
+    # Enable embedded asset hot reloading for native dev builds.
+    "bevy/embedded_watcher",
+]
+
+
+[package.metadata.bevy_cli.release]
+# Disable dev features for release builds.
+default-features = false
+
+[package.metadata.bevy_cli.web]
+# Disable native features for web builds.
+default-features = false
+
+[package.metadata.bevy_cli.web.dev]
+features = ["dev"]
+
+
+[lints.rust]
+# Mark `bevy_lint` as a valid `cfg`, as it is set when the Bevy linter runs.
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(bevy_lint)"] }
+
+[lints.clippy]
+# Bevy supplies arguments to systems via dependency injection, so it's natural for systems to
+# request more than 7 arguments, which would undesirably trigger this lint.
+too_many_arguments = "allow"
+# Queries may access many components, which would undesirably trigger this lint.
+type_complexity = "allow"
+# Make sure macros use their standard braces, such as `[]` for `bevy_ecs::children!`.
+nonstandard_macro_braces = "warn"
+

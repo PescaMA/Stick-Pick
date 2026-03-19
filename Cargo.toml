@@ -5,13 +5,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+ldtk = { version = "0.4.0", features = ["ldtk-v0-9-3"] }
+rand = "0.9"
 avian2d = "0.5.0"
-bevy = { version = "0.18", features = ["webgpu","web"] }
+bevy = { version = "0.18", features = ["webgpu", "web"] }
+bevy_ecs_ldtk = "0.14.0"
 bevy-inspector-egui = "0.36.0"
 bevy_ecs_tilemap = "0.18.1"
 bevy_firefly = "0.18.0"
-bevy_map = {version = "0.5", features = ["physics"]}
-rand = "0.9"
+bevy_map = { version = "0.5", features = ["physics"] }
 # Compile out low-severity logs to improve performance.
 # Remove these features if you want to profile your game with tracy.
 # (see <https://github.com/bevyengine/bevy/blob/main/docs/profiling.md#tracy-profiler>)
@@ -19,6 +21,7 @@ tracing = { version = "0.1", features = [
     "max_level_debug",
     "release_max_level_warn",
 ] }
+
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.3", features = ["wasm_js"] }

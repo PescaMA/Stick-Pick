@@ -26,10 +26,10 @@
         }
       ],
       "tile_properties": {
-        "19": {
+        "52": {
           "collision": {
             "shape": {
-              "type": "None"
+              "type": "Full"
             },
             "body_type": "Static",
             "one_way": "None",
@@ -39,18 +39,18 @@
           "grid_width": 0,
           "grid_height": 0
         },
-        "137": {
+        "36": {
           "collision": {
             "shape": {
               "type": "Full"
             },
             "body_type": "Static",
             "one_way": "None",
-            "layer": 1,
-            "mask": 1
+            "layer": 0,
+            "mask": 31
           }
         },
-        "20": {
+        "0": {
           "collision": {
             "shape": {
               "type": "Full"
@@ -74,55 +74,7 @@
           "grid_width": 0,
           "grid_height": 0
         },
-        "52": {
-          "collision": {
-            "shape": {
-              "type": "Full"
-            },
-            "body_type": "Static",
-            "one_way": "None",
-            "layer": 0,
-            "mask": 0
-          },
-          "grid_width": 0,
-          "grid_height": 0
-        },
         "34": {
-          "collision": {
-            "shape": {
-              "type": "Full"
-            },
-            "body_type": "Static",
-            "one_way": "None",
-            "layer": 0,
-            "mask": 0
-          }
-        },
-        "38": {
-          "collision": {
-            "shape": {
-              "type": "Full"
-            },
-            "body_type": "Static",
-            "one_way": "None",
-            "layer": 0,
-            "mask": 0
-          }
-        },
-        "51": {
-          "collision": {
-            "shape": {
-              "type": "Full"
-            },
-            "body_type": "Static",
-            "one_way": "None",
-            "layer": 0,
-            "mask": 0
-          },
-          "grid_width": 0,
-          "grid_height": 0
-        },
-        "0": {
           "collision": {
             "shape": {
               "type": "Full"
@@ -144,7 +96,31 @@
             "mask": 31
           }
         },
-        "36": {
+        "137": {
+          "collision": {
+            "shape": {
+              "type": "Full"
+            },
+            "body_type": "Static",
+            "one_way": "None",
+            "layer": 1,
+            "mask": 1
+          }
+        },
+        "19": {
+          "collision": {
+            "shape": {
+              "type": "None"
+            },
+            "body_type": "Static",
+            "one_way": "None",
+            "layer": 0,
+            "mask": 0
+          },
+          "grid_width": 0,
+          "grid_height": 0
+        },
+        "51": {
           "collision": {
             "shape": {
               "type": "Full"
@@ -152,7 +128,31 @@
             "body_type": "Static",
             "one_way": "None",
             "layer": 0,
-            "mask": 31
+            "mask": 0
+          },
+          "grid_width": 0,
+          "grid_height": 0
+        },
+        "38": {
+          "collision": {
+            "shape": {
+              "type": "Full"
+            },
+            "body_type": "Static",
+            "one_way": "None",
+            "layer": 0,
+            "mask": 0
+          }
+        },
+        "20": {
+          "collision": {
+            "shape": {
+              "type": "Full"
+            },
+            "body_type": "Static",
+            "one_way": "None",
+            "layer": 0,
+            "mask": 0
           }
         }
       },
@@ -316,8 +316,10 @@
                 null,
                 null,
                 null,
+                36,
                 null,
                 null,
+                36,
                 null,
                 null,
                 null,
@@ -330,6 +332,7 @@
                 null,
                 null,
                 null,
+                36,
                 null,
                 null,
                 null,
@@ -363,13 +366,6 @@
                 null,
                 null,
                 null,
-                35,
-                35,
-                35,
-                35,
-                35,
-                35,
-                35,
                 null,
                 null,
                 null,
@@ -379,13 +375,6 @@
                 null,
                 null,
                 null,
-                35,
-                35,
-                35,
-                35,
-                35,
-                35,
-                35,
                 null,
                 null,
                 null,
@@ -396,7 +385,6 @@
                 null,
                 null,
                 null,
-                35,
                 null,
                 null,
                 null,
@@ -413,7 +401,19 @@
                 null,
                 null,
                 null,
-                35,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 null,
                 null,
                 null,
@@ -10511,7 +10511,111 @@
           }
         ],
         "tile_terrains": {
-          "17": {
+          "21": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "53": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "54": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "52": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "36": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "70": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "35": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "55": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "19": {
             "terrains": [
               null,
               null,
@@ -10550,7 +10654,7 @@
               null
             ]
           },
-          "71": {
+          "17": {
             "terrains": [
               null,
               null,
@@ -10561,6 +10665,19 @@
               null,
               null,
               null
+            ]
+          },
+          "137": {
+            "terrains": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
             ]
           },
           "37": {
@@ -10576,72 +10693,7 @@
               null
             ]
           },
-          "53": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "21": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "35": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "3": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "19": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "36": {
+          "73": {
             "terrains": [
               null,
               null,
@@ -10680,45 +10732,6 @@
               null
             ]
           },
-          "55": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "73": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "137": {
-            "terrains": [
-              2,
-              2,
-              2,
-              2,
-              2,
-              2,
-              2,
-              2,
-              2
-            ]
-          },
           "0": {
             "terrains": [
               null,
@@ -10732,33 +10745,7 @@
               null
             ]
           },
-          "70": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "54": {
-            "terrains": [
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "20": {
+          "71": {
             "terrains": [
               null,
               null,
@@ -10784,7 +10771,20 @@
               null
             ]
           },
-          "52": {
+          "3": {
+            "terrains": [
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "20": {
             "terrains": [
               null,
               null,

@@ -3,7 +3,7 @@
 //! This module is regenerated when you save your map project with code generation enabled.
 //! Do not edit manually - your changes will be overwritten!
 
-use bevy::prelude::*;
+use engine::prelude::*;
 
 mod entities;
 mod stubs;

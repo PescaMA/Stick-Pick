@@ -13,11 +13,9 @@
 //! purposes. If you want to move the player in a smoother way,
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
-use avian2d::prelude::{CollidingEntities, Gravity, GravityScale};
-use bevy::{prelude::*, window::PrimaryWindow};
-use bevy_map::runtime::CameraBounds;
+use engine::prelude::*;
 
-use crate::{AppSystems, PausableSystems, game::player::Player};
+use crate::{AppSystems, PausableSystems, player::Player};
 
 const STICKY_LAYER: usize = 1;
 const SOLID_LAYER: usize = 0;

@@ -3,13 +3,10 @@
 use crate::{
     asset_tracking::LoadResource,
     audio::music,
-    game::player::{PlayerAssets, player},
+    player::{PlayerAssets, player},
     screens::Screen,
 };
-use avian2d::prelude::CollisionLayers;
-use bevy::prelude::*;
-use bevy_ecs_tilemap::{map::TilemapId, tiles::TilePos};
-use bevy_map::{MapHandle, runtime::MapLayerIndex};
+use engine::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<LevelAssets>();

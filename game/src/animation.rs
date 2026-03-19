@@ -4,14 +4,14 @@
 //! - [Sprite animation](https://github.com/bevyengine/bevy/blob/latest/examples/2d/sprite_animation.rs)
 //! - [Timers](https://github.com/bevyengine/bevy/blob/latest/examples/time/timers.rs)
 
-use bevy::prelude::*;
-use rand::prelude::*;
+use engine::prelude::*;
+use rand::seq::IndexedRandom;
 use std::time::Duration;
 
 use crate::{
     AppSystems, PausableSystems,
     audio::sound_effect,
-    game::{movement::MovementController, player::PlayerAssets},
+    movement::MovementController, player::PlayerAssets,
 };
 
 pub(super) fn plugin(app: &mut App) {

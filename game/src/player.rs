@@ -1,20 +1,13 @@
 //! Player-specific behavior.
 
-use avian2d::prelude::*;
-use bevy::{
-    image::{ImageLoaderSettings, ImageSampler},
-    prelude::*,
-};
-use bevy_firefly::prelude::*;
+use bevy_firefly::lights::PointLight2d;
+use engine::prelude::*;
 
 use crate::{
-    AppSystems, PausableSystems,
+    AppSystems, PausableSystems, SPRITE_SCALE,
+    animation::PlayerAnimation,
     asset_tracking::LoadResource,
-    game::{
-        SPRITE_SCALE,
-        animation::PlayerAnimation,
-        movement::{MovementController, ScreenWrap},
-    },
+    movement::{MovementController, ScreenWrap},
 };
 
 const PLAYER_SPRITE_SIZE: f32 = 32.;

@@ -1,5 +1,5 @@
 use super::entities::*;
-use bevy::prelude::*;
+use engine::prelude::*;
 /// Called every frame for sticky entities
 ///
 /// Use this to implement movement, AI, or other per-frame logic.

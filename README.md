@@ -7,8 +7,8 @@ Check out the [documentation](https://github.com/TheBevyFlock/bevy_new_2d/blob/m
 ## TODO list: 
 
 - [x] Write the TODO list
-- [] Separate project in packages for faster compilation 
-- [50%] Use LDTK instead of bevy_map_editor for easier tile loading
+- [x] Separate project in packages for faster compilation (30-60s to 5s)
+- [50%] Use LDTK instead of bevy_map_editor for easier tile loading (downloaded everything needed, added to apps so can actually open ldtk)
 
 ** until week 5 (23.03.2026)
 

@@ -7,9 +7,9 @@ use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 use crate::screens::Screen;
 
-const TOGGLE_KEY: KeyCode = KeyCode::Backquote;
+pub const TOGGLE_KEY: KeyCode = KeyCode::Backquote;
 
-pub(super) fn plugin(app: &mut App) {
+pub fn plugin(app: &mut App) {
     // Log `Screen` state transitions.
     app.add_systems(Update, log_transitions::<Screen>);
 

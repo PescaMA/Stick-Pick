@@ -1,10 +1,9 @@
 //! The credits menu.
-
-use bevy::{ecs::spawn::SpawnIter, input::common_conditions::input_just_pressed, prelude::*};
+use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 
 use crate::{asset_tracking::LoadResource, audio::music, menus::Menu, theme::prelude::*};
 
-pub(super) fn plugin(app: &mut App) {
+pub fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Credits), spawn_credits_menu);
     app.add_systems(
         Update,
@@ -15,7 +14,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Credits), start_credits_music);
 }
 
-fn spawn_credits_menu(mut commands: Commands) {
+pub fn spawn_credits_menu(mut commands: Commands) {
     commands.spawn((
         widget::ui_root("Credits Menu"),
         GlobalZIndex(2),
@@ -30,14 +29,14 @@ fn spawn_credits_menu(mut commands: Commands) {
     ));
 }
 
-fn created_by() -> impl Bundle {
+pub fn created_by() -> impl Bundle {
     grid(vec![
         ["Joe Shmoe", "Implemented alligator wrestling AI"],
         ["Jane Doe", "Made the music for the alien invasion"],
     ])
 }
 
-fn assets() -> impl Bundle {
+pub fn assets() -> impl Bundle {
     grid(vec![
         ["Ducky sprite", "CC0 by Caz Creates Games"],
         ["Button SFX", "CC0 by Jaszunio15"],
@@ -49,7 +48,7 @@ fn assets() -> impl Bundle {
     ])
 }
 
-fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
+pub fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
     (
         Name::new("Grid"),
         Node {

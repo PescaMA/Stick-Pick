@@ -4,7 +4,7 @@ This project was generated using the [Bevy New 2D](https://github.com/TheBevyFlo
 Check out the [documentation](https://github.com/TheBevyFlock/bevy_new_2d/blob/main/README.md) to get started!
 
 
-## TODO list: 
+## Genearal TODO list: 
 
 - [x] Write the TODO list
 - [x] Separate project in packages for faster compilation (30-60s to 5s)
@@ -16,7 +16,7 @@ Check out the [documentation](https://github.com/TheBevyFlock/bevy_new_2d/blob/m
 
 ** until week 7 (6.04.2026)
 
-- [] Make levels
+- [] Make levels, fun gameplay
 
 ** until week 8 (20.04.2026)
 

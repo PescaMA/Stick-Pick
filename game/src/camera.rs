@@ -1,8 +1,7 @@
 use crate::{
-    SPRITE_SCALE,
-    player::{PLAYER_SPAWN_POSITION, Player},
+    SPRITE_SCALE, player::{PLAYER_SPAWN_POSITION, Player}
 };
-use engine::prelude::*;
+use bevy::{prelude::*, window::PrimaryWindow};
 
 use bevy_firefly::prelude::*;
 

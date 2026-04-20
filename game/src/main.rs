@@ -3,8 +3,9 @@
 //! Feel free to change the logic found here if you feel like tinkering around
 //! to get a feeling for the template.
 
+use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy_map::{MapCollisionPlugin, MapRuntimePlugin};
 use cli_template::{screens::Screen, *};
-use engine::prelude::*;
 
 use generated::GeneratedPlugin;
 
@@ -35,10 +36,9 @@ pub fn plugin(app: &mut App) {
 }
 
 fn main() -> AppExit {
-
-	info!("starting app");
+    info!("starting app");
     let mut app = App::new();
-    
+
     // Add Bevy plugins.
     app.add_plugins((
         DefaultPlugins
@@ -61,8 +61,7 @@ fn main() -> AppExit {
         MapRuntimePlugin,
         MapCollisionPlugin, // also adds PhysicsPlugins::default());
     ));
-    
-    
+
     app.add_plugins(AppPlugin);
     app.add_plugins(plugin).run()
 }

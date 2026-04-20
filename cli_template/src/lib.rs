@@ -4,7 +4,6 @@
 #![cfg_attr(not(feature = "dev"), windows_subsystem = "windows")]
 
 use bevy::prelude::*;
-use engine::prelude::{States, SystemSet};
 
 pub mod asset_tracking;
 pub mod audio;
@@ -38,8 +37,6 @@ pub struct AppPlugin;
 
 impl Plugin for AppPlugin {
     fn build(&self, app: &mut App) {
-        
-
         // Add other plugins.
         app.add_plugins((
             asset_tracking::plugin,

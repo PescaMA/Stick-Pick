@@ -387,9 +387,9 @@ dependencies = [
 
 [[package]]
 name = "avian2d"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "867b186e1e69d00f7cef21fe70bb700703fd2981db4a4ce261c85eb85bc4c75c"
+checksum = "ca2e2e4ff95a98637980909357a9e05c7fe906b3bff3c5dc12e735b29bb42c4d"
 dependencies = [
  "approx",
  "arrayvec",
@@ -2262,9 +2262,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.6.0"
+version = "4.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b193af5b67834b676abd72466a96c1024e6a6ad978a1f484bd90b85c94041351"
+checksum = "1ddb117e43bbf7dacf0a4190fef4d345b9bad68dfc649cb349e7d17d28428e51"
 dependencies = [
  "clap_builder",
 ]
@@ -2295,7 +2295,6 @@ dependencies = [
  "bevy_ecs_tilemap",
  "bevy_firefly",
  "bevy_map",
- "engine",
  "getrandom 0.3.4",
 ]
 
@@ -2874,23 +2873,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "engine"
-version = "0.1.0"
-dependencies = [
- "avian2d 0.6.0",
- "bevy",
- "bevy-inspector-egui",
- "bevy_ecs_ldtk",
- "bevy_ecs_tilemap",
- "bevy_firefly",
- "bevy_map",
- "getrandom 0.3.4",
- "ldtk",
- "rand 0.10.0",
- "tracing",
-]
-
-[[package]]
 name = "epaint"
 version = "0.33.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3206,6 +3188,7 @@ dependencies = [
 name = "game"
 version = "0.1.0"
 dependencies = [
+ "avian2d 0.6.1",
  "bevy",
  "bevy-inspector-egui",
  "bevy_ecs_ldtk",
@@ -3213,7 +3196,6 @@ dependencies = [
  "bevy_firefly",
  "bevy_map",
  "cli_template",
- "engine",
  "getrandom 0.3.4",
  "rand 0.10.0",
 ]
@@ -3638,15 +3620,6 @@ dependencies = [
 
 [[package]]
 name = "heck"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d621efb26863f0e9924c6ac577e8275e5e6b77455db64ffa6c65c904e9e132c"
-dependencies = [
- "unicode-segmentation",
-]
-
-[[package]]
-name = "heck"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
@@ -3878,18 +3851,6 @@ name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
-
-[[package]]
-name = "ldtk"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9f347422286aa0e50f1c46ef87cb7b29ec041c538cba148230bf998c34d2378"
-dependencies = [
- "heck 0.3.3",
- "quote",
- "serde",
- "serde_json",
-]
 
 [[package]]
 name = "leb128fmt"
@@ -4751,9 +4712,9 @@ dependencies = [
 
 [[package]]
 name = "obvhs"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f317a1c29744b0e63bdf1733443fad6805a86ab6db403671f945456041cc84b3"
+checksum = "f5a714277d5f74beb21a12cb8fb1d4774df5c637c2a0278ff3ebd812f42f7c1e"
 dependencies = [
  "bytemuck",
  "glam 0.30.10",
@@ -7337,7 +7298,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ea61de684c3ea68cb082b7a88508a8b27fcc8b797d738bfc99a82facf1d752dc"
 dependencies = [
  "anyhow",
- "heck 0.5.0",
+ "heck",
  "wit-parser",
 ]
 
@@ -7348,7 +7309,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7c566e0f4b284dd6561c786d9cb0142da491f46a9fbed79ea69cdad5db17f21"
 dependencies = [
  "anyhow",
- "heck 0.5.0",
+ "heck",
  "indexmap",
  "prettyplease",
  "syn",

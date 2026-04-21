@@ -16,66 +16,69 @@
 use avian2d::prelude::*;
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_map::runtime::CameraBounds;
+use cli_template::Pause;
 
 use crate::{AppSystems, PausableSystems, player::Player};
 
 const STICKY_LAYER: usize = 1;
+const GRAVITY: f32 = -200.;
+const GRAVITY_CAP: f32 = -20_000.;
 // const SOLID_LAYER: usize = 0;
 
-pub(super) fn plugin(app: &mut App) {
-    app.insert_resource(Gravity(Vec2::new(0.0, -800.0)));
+pub(crate) fn plugin(app: &mut App) {
+    app.insert_resource(Gravity(Vec2::new(0.0, GRAVITY)));
     // app.add_plugins(PhysicsPlugins::default());
     app.add_systems(
         Update,
-        (
+        ((
             apply_movement,
             apply_screen_wrap,
             apply_level_wrap,
             collide_sticky,
+            gravity_cap,
         )
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
+        pause_physics.run_if(in_state(Pause(true))),
+        unpause_physics.run_if(in_state(Pause(false))),
+
+        ),
+            
     );
 }
 
 /// These are the movement parameters for our character controller.
 /// For now, this is only used for a single player, but it could power NPCs or
 /// other players as well.
-#[derive(Component, Reflect)]
+#[derive(Component, Reflect, Default)]
 #[reflect(Component)]
 pub struct MovementController {
-    /// The direction the character wants to move in.
     pub intent: Vec2,
-
-    /// Maximum speed in world units per second.
-    /// 1 world unit = 1 pixel when using the default 2D camera and no physics engine.
-    pub max_speed: f32,
 }
 
-impl Default for MovementController {
-    fn default() -> Self {
-        Self {
-            intent: Vec2::ZERO,
-            // 400 pixels per second is a nice default, but we can still vary this per character.
-            max_speed: 400.0,
-        }
-    }
+fn pause_physics(mut time: ResMut<Time<Physics>>) {
+    time.pause();
 }
+fn unpause_physics(mut time: ResMut<Time<Physics>>) {
+    time.unpause();
+}
+
 
 fn apply_movement(
     time: Res<Time>,
     mut movement_query: Query<(&MovementController, &mut Transform)>,
 ) {
     for (controller, mut transform) in &mut movement_query {
-        let velocity = controller.max_speed * controller.intent;
-        transform.translation += velocity.extend(0.0) * time.delta_secs();
+        let velocity = controller.intent;
+        transform.translation += velocity.extend(0.0) * time.delta_secs() * -GRAVITY;
     }
 }
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub struct ScreenWrap;
+
 
 fn collide_sticky(
     mut query: Query<(Entity, &CollidingEntities, &mut GravityScale), With<Player>>,
@@ -90,7 +93,7 @@ fn collide_sticky(
 
             let name = names.get(*colide).unwrap().as_str();
 
-            // info!("thy name is {name}. maybe {STICKY_LAYER}");
+            info!("thy name is {name}. maybe {STICKY_LAYER}");
 
             if name == STICKY_LAYER.to_string() {
                 // info!("touching sticky");
@@ -133,5 +136,13 @@ fn apply_level_wrap(
 
             transform.translation = result.extend(transform.translation.z);
         }
+    }
+}
+
+fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
+    let delta_secs = time.delta_secs();
+    for mut linear_velocity in &mut query {
+        // Accelerate the entity towards +X at `2.0` units per second squared.
+        linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP * delta_secs);
     }
 }

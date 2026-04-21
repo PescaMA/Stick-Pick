@@ -4,11 +4,12 @@ use avian2d::prelude::*;
 use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*};
 use bevy_firefly::lights::PointLight2d;
 
+pub mod animation;
+pub mod movement;
+
 use crate::{
     AppSystems, PausableSystems, SPRITE_SCALE,
-    animation::PlayerAnimation,
-    asset_tracking::LoadResource,
-    movement::{MovementController, ScreenWrap},
+    asset_tracking::LoadResource, player::{animation::PlayerAnimation, movement::{MovementController, ScreenWrap}},
 };
 
 const PLAYER_SPRITE_SIZE: f32 = 32.;
@@ -28,7 +29,6 @@ pub(super) fn plugin(app: &mut App) {
 
 /// The player character.
 pub fn player(
-    max_speed: f32,
     player_assets: &PlayerAssets,
     texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
 ) -> impl Bundle {
@@ -50,7 +50,6 @@ pub fn player(
         ),
         Transform::from_scale(Vec2::splat(SPRITE_SCALE).extend(1.0)),
         MovementController {
-            max_speed,
             ..default()
         },
         ScreenWrap,

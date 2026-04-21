@@ -11,7 +11,7 @@ use std::time::Duration;
 
 use crate::{audio::sound_effect, movement::MovementController, player::PlayerAssets};
 
-pub(super) fn plugin(app: &mut App) {
+pub(crate) fn plugin(app: &mut App) {
     // Animate and play sound effects based on controls.
     app.add_systems(
         Update,

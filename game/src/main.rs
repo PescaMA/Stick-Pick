@@ -3,19 +3,19 @@
 //! Feel free to change the logic found here if you feel like tinkering around
 //! to get a feeling for the template.
 
+use avian2d::PhysicsPlugins;
 use bevy::{asset::AssetMetaCheck, prelude::*};
 use bevy_map::{MapCollisionPlugin, MapRuntimePlugin};
 use cli_template::{screens::Screen, *};
 
 use generated::GeneratedPlugin;
 
-use crate::level::spawn_level;
+use crate::{level::spawn_level, player::{animation, movement}};
 
-mod animation;
+
 mod camera;
 mod generated;
 pub mod level;
-mod movement;
 pub mod player;
 
 const SPRITE_SOURCE_PX: f32 = 16.0;
@@ -59,7 +59,8 @@ fn main() -> AppExit {
                 ..default()
             }),
         MapRuntimePlugin,
-        MapCollisionPlugin, // also adds PhysicsPlugins::default());
+        PhysicsPlugins::default(),
+        MapCollisionPlugin,
     ));
 
     app.add_plugins(AppPlugin);

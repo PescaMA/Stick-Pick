@@ -40,6 +40,7 @@ pub(crate) fn plugin(app: &mut App) {
             .chain()
             .in_set(AppSystems::Update)
             .in_set(PausableSystems),
+            
         pause_physics.run_if(in_state(Pause(true))),
         unpause_physics.run_if(in_state(Pause(false))),
 

@@ -5,16 +5,15 @@
 
 use avian2d::PhysicsPlugins;
 use bevy::{asset::AssetMetaCheck, prelude::*};
-use bevy_map::{MapCollisionPlugin, MapRuntimePlugin};
-use cli_template::{screens::Screen, *};
+use cli_template::*;
 
-use generated::GeneratedPlugin;
 
-use crate::{level::spawn_level, player::{animation, movement}};
+use crate::{player::{animation, movement}};
 
 
 mod camera;
-mod generated;
+
+
 pub mod level;
 pub mod player;
 
@@ -29,10 +28,9 @@ pub fn plugin(app: &mut App) {
         movement::plugin,
         player::plugin,
         camera::plugin,
-        GeneratedPlugin,
     ));
 
-    app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
+    
 }
 
 fn main() -> AppExit {
@@ -58,9 +56,7 @@ fn main() -> AppExit {
                 .into(),
                 ..default()
             }),
-        MapRuntimePlugin,
         PhysicsPlugins::default(),
-        MapCollisionPlugin,
     ));
 
     app.add_plugins(AppPlugin);

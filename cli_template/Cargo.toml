@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = { workspace = true}
-bevy_ecs_ldtk = { workspace = true}
-bevy-inspector-egui = { workspace = true}
-bevy_ecs_tilemap = { workspace = true}
-bevy_firefly = { workspace = true}
-bevy_map = { workspace = true}
+bevy = { workspace = true }
+bevy_ecs_ldtk = { workspace = true }
+bevy-inspector-egui = { workspace = true }
+bevy_ecs_tilemap = { workspace = true }
+bevy_firefly = { workspace = true }
+bevy_map = { workspace = true }
 
 
 [target.wasm32-unknown-unknown.dependencies]
@@ -47,11 +47,11 @@ default-features = false
 features = ["dev"]
 
 
-[lints.rust]
+[package.metadata.lints.rust]
 # Mark `bevy_lint` as a valid `cfg`, as it is set when the Bevy linter runs.
 unexpected_cfgs = { level = "warn", check-cfg = ["cfg(bevy_lint)"] }
 
-[lints.clippy]
+[package.metadata.lints.clippy]
 # Bevy supplies arguments to systems via dependency injection, so it's natural for systems to
 # request more than 7 arguments, which would undesirably trigger this lint.
 too_many_arguments = "allow"
@@ -65,4 +65,3 @@ nonstandard_macro_braces = "warn"
 [package.metadata.bevy_lint]
 # panicking_methods = "deny"
 # pedantic = "warn"
-

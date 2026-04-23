@@ -1,5 +1,7 @@
 use crate::{
-    SPRITE_SCALE, player::{PLAYER_SPAWN_POSITION, Player}
+    SPRITE_SCALE,
+    level::LevelBoundaries,
+    player::{PLAYER_SPAWN_POSITION, Player},
 };
 use bevy::{prelude::*, window::PrimaryWindow};
 
@@ -31,10 +33,11 @@ fn update_camera(
     mut camera: Single<&mut Transform, (With<Camera2d>, Without<Player>)>,
     player: Single<&Transform, (With<Player>, Without<Camera2d>)>,
     time: Res<Time>,
+    level_boundary: Res<LevelBoundaries>,
 ) {
-    let y = player.translation.y.max(PLAYER_SPAWN_POSITION.y);
+    let y = player.translation.y.max(PLAYER_SPAWN_POSITION.y); // let camera go only up
 
-    let direction = Vec3::new(0., y, camera.translation.z);
+    let direction = Vec3::new(level_boundary.center_x(), y, camera.translation.z);
 
     // smooth effect to camera movement that follows player
 

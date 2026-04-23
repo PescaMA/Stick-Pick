@@ -1,15 +1,17 @@
 //! Player-specific behavior.
 
-use avian2d::prelude::*;
-use bevy::{image::{ImageLoaderSettings, ImageSampler}, prelude::*};
-use bevy_firefly::lights::PointLight2d;
+use bevy::{
+    image::{ImageLoaderSettings, ImageSampler},
+    prelude::*,
+};
 
-pub mod animation;
 pub mod movement;
+pub mod physics;
 
 use crate::{
-    AppSystems, PausableSystems, SPRITE_SCALE,
-    asset_tracking::LoadResource, player::{animation::PlayerAnimation, movement::{MovementController, ScreenWrap}},
+    AppSystems, PausableSystems,
+    asset_tracking::LoadResource,
+    player::{movement::MovementController, physics::apply_impulse_on_x},
 };
 
 const PLAYER_SPRITE_SIZE: f32 = 32.;
@@ -18,6 +20,8 @@ pub const PLAYER_SPAWN_POSITION: Vec3 = vec3(100., 30., 1.);
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<PlayerAssets>();
 
+    app.add_plugins(physics::plugin);
+
     // Record directional input as movement controls.
     app.add_systems(
         Update,
@@ -25,55 +29,6 @@ pub(super) fn plugin(app: &mut App) {
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
     );
-}
-
-/// The player character.
-pub fn player(
-    player_assets: &PlayerAssets,
-    texture_atlas_layouts: &mut Assets<TextureAtlasLayout>,
-) -> impl Bundle {
-    // A texture atlas is a way to split a single image into a grid of related images.
-    // You can learn more in this example: https://github.com/bevyengine/bevy/blob/latest/examples/2d/texture_atlas.rs
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(32), 6, 2, Some(UVec2::splat(1)), None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let player_animation = PlayerAnimation::new();
-
-    (
-        Name::new("Player"),
-        Player,
-        Sprite::from_atlas_image(
-            player_assets.image.clone(),
-            TextureAtlas {
-                layout: texture_atlas_layout,
-                index: player_animation.get_atlas_index(),
-            },
-        ),
-        Transform::from_scale(Vec2::splat(SPRITE_SCALE).extend(1.0)),
-        MovementController {
-            ..default()
-        },
-        ScreenWrap,
-        player_animation,
-        PointLight2d {
-            // for firefly lighting
-            color: Color::srgb(0.2, 0.0, 1.0),
-            range: PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.,
-            intensity: 4.0,
-            ..default()
-        },
-        (
-            RigidBody::Dynamic, // affected by gravity/colissions
-            // Capsule prevents catching on tile edges
-            Collider::capsule(7.0, 8.0),
-            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
-            // LockedAxes::ROTATION_LOCKED,
-            Friction::new(0.1),
-            Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
-            LinearVelocity::ZERO,  // start stationary
-            CollidingEntities::default(), // track collisions
-            GravityScale(1.0),
-        ),
-    )
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
@@ -106,22 +61,6 @@ fn record_player_directional_input(
     // Apply movement intent to controllers.
     for mut controller in &mut controller_query {
         controller.intent = intent;
-    }
-}
-
-fn apply_impulse_on_x(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut LinearVelocity, &mut AngularVelocity), With<Player>>,
-) {
-    if !keyboard.just_pressed(KeyCode::KeyX) {
-        return;
-    }
-
-    for (mut linear_velocity, mut angular_velocity) in &mut query {
-        linear_velocity.x += 200.0;
-        linear_velocity.x += 200.0;
-
-        angular_velocity.0 += 0.5;
     }
 }
 

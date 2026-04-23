@@ -14,7 +14,7 @@
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
 use avian2d::prelude::*;
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
 use cli_template::Pause;
 
 use crate::{AppSystems, PausableSystems, level::LevelBoundaries};
@@ -29,8 +29,7 @@ pub(crate) fn plugin(app: &mut App) {
         (
             (
                 apply_movement,
-                apply_screen_wrap,
-                apply_level_wrap,
+                apply_level_block,
                 // collide_wall,
                 gravity_cap,
             )
@@ -74,72 +73,35 @@ fn apply_movement(
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-pub struct ScreenWrap;
+pub struct ScreenBlock;
 
-// fn collide_wall(
-//     mut query: Query<
-//         (
-//             Option<&CollidingEntities>,
-//             &MovementController,
-//             &mut LinearVelocity,
-//             &mut GravityScale,
-//         ),
-//         With<Player>,
-//     >,
-//     wall: Query<&Wall>,
-// ) {
-//     for (colliding_entities, intent, mut velocity, mut gravity) in query.iter_mut() {
-//         gravity.0 = 1.0;
-
-//         if colliding_entities.is_none() {
-//             continue;
-//         }
-
-//         for collide in colliding_entities.unwrap().iter() {
-//             if wall.get(*collide).is_err() {
-//                 continue;
-//             }
-
-//             gravity.0 = 0.0;
-
-//             if intent.intent == Vec2::ZERO {
-//                 velocity.y = 0.0;
-//                 velocity.x = 0.0;
-//             }
-
-//             break;
-//         }
-//     }
-// }
-
-fn apply_screen_wrap(
-    window: Single<&Window, With<PrimaryWindow>>,
-    mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
-) {
-    let size = window.size() + 32.0;
-    let half_size = size / 2.0;
-    for mut transform in &mut wrap_query {
-        let position = transform.translation.xy();
-        let wrapped = (position + half_size).rem_euclid(size) - half_size;
-        transform.translation = wrapped.extend(transform.translation.z);
-    }
-}
-
-// // dummy code
-fn apply_level_wrap(
-    mut wrap_query: Query<&mut Transform, With<ScreenWrap>>,
+fn apply_level_block(
+    mut wrap_query: Query<(&mut Transform, Option<&mut LinearVelocity>), With<ScreenBlock>>,
     level_bound: Res<LevelBoundaries>,
 ) {
-    for mut transform in &mut wrap_query {
+    /// for not getting stuck between edge and block
+    const EXTRA_PADDING: f32 = 3.5;
+
+    for (mut transform, velocity_opt) in &mut wrap_query {
         let mut result = transform.translation.xy();
-        if result.y < level_bound.origin.y {
-            result.y = -level_bound.origin.y;
-        }
-        if result.x < level_bound.origin.x {
-            result.x = level_bound.origin.x + level_bound.length.x;
-        }
-        if result.x > level_bound.origin.x + level_bound.length.x {
-            result.x -= level_bound.length.x;
+        result.x = result.x.clamp(
+            level_bound.origin.x + EXTRA_PADDING,
+            level_bound.origin.x + level_bound.length.x - EXTRA_PADDING,
+        );
+
+        result.y = result.y.clamp(
+            level_bound.origin.y + EXTRA_PADDING,
+            level_bound.origin.y + level_bound.length.y - EXTRA_PADDING,
+        );
+
+        if let Some(mut vel) = velocity_opt {
+            // If clamp changed an axis, reset that component of linear velocity to zero.
+            if result.x != transform.translation.x {
+                vel.x = 0.0;
+            }
+            if result.y != transform.translation.y {
+                vel.y = 0.0;
+            }
         }
 
         transform.translation = result.extend(transform.translation.z);

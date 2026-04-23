@@ -6,7 +6,7 @@ use crate::{
     SPRITE_SCALE,
     player::{
         PLAYER_SPRITE_SIZE, Player,
-        movement::{GRAVITY, MovementController, ScreenWrap},
+        movement::{GRAVITY, MovementController, ScreenBlock},
     },
 };
 
@@ -20,7 +20,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
     for player_ent in new_players.iter() {
         commands.entity(player_ent).insert((
             MovementController { ..default() },
-            ScreenWrap,
+            ScreenBlock,
             (
                 RigidBody::Dynamic, // affected by gravity/colissions
                 // Capsule prevents catching on tile edges

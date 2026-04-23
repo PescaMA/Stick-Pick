@@ -543,7 +543,7 @@
 		},
 		{
 			"__type": "IntGrid",
-			"identifier": "Collisions",
+			"identifier": "Collisions_Sticky",
 			"type": "IntGrid",
 			"uid": 1,
 			"doc": null,
@@ -1428,7 +1428,7 @@
 					]
 				},
 				{
-					"__identifier": "Collisions",
+					"__identifier": "Collisions_Sticky",
 					"__type": "IntGrid",
 					"__cWid": 20,
 					"__cHei": 36,

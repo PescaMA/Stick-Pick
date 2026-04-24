@@ -54,6 +54,10 @@ fn resize_system(
     let win_w = window.width();
     let win_h = window.height();
 
+    if win_h == 0. {
+        return; // window minimized
+    }
+
     let scale_x = win_w / VIRTUAL_WIDTH;
     let scale_y = win_h / VIRTUAL_HEIGHT;
     let scale = scale_x.min(scale_y);

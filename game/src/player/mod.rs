@@ -5,6 +5,7 @@ use bevy::{
     prelude::*,
 };
 
+pub mod drag;
 pub mod movement;
 pub mod physics;
 
@@ -20,7 +21,7 @@ pub const PLAYER_SPAWN_POSITION: Vec3 = vec3(100., 30., 1.);
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<PlayerAssets>();
 
-    app.add_plugins(physics::plugin);
+    app.add_plugins((physics::plugin, movement::plugin, drag::plugin));
 
     // Record directional input as movement controls.
     app.add_systems(

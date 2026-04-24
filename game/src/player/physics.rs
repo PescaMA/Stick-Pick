@@ -10,6 +10,9 @@ use crate::{
     },
 };
 
+#[derive(Component, Default)]
+pub struct PlayerPart;
+
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(Gravity(Vec2::new(0.0, GRAVITY)));
     app.add_plugins((PhysicsPlugins::default(), PhysicsDebugPlugin))
@@ -42,6 +45,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
             .with_children(|children| {
                 // Spawn the child colliders positioned relative to the rigid body
                 children.spawn((
+                    PlayerPart,
                     Name::new("PickHead"),
                     Transform::from_xyz(0.0, 10.0, 0.0)
                         .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
@@ -62,6 +66,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                     ),
                 ));
                 children.spawn((
+                    PlayerPart,
                     Name::new("Handle"),
                     Transform::from_xyz(0.0, -4.0, 0.0),
                     (

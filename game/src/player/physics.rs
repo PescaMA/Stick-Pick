@@ -10,7 +10,13 @@ use crate::{
     },
 };
 
-#[derive(Component, Default)]
+const DAMPING_FACTOR: f32 = 0.5;
+const MAX_ANGULAR_SPEED: f32 = 18.;
+const LIGHT_COLOR: Color = Color::srgb(0.556, 0.654, 0.238);
+const LIGHT_INTENSITY: f32 = 3.2;
+const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.;
+
+#[derive(Component, Default, Clone)]
 pub struct PlayerPart;
 
 pub(crate) fn plugin(app: &mut App) {
@@ -28,61 +34,54 @@ pub(crate) fn plugin(app: &mut App) {
 
 fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Player>>) {
     for player_ent in new_players.iter() {
+        let common_things = (
+            PlayerPart,
+            LinearVelocity::ZERO,         // start stationary
+            CollidingEntities::default(), // track collisions
+            GravityScale(1.0),
+            Friction::new(0.3), // friction with other colliders
+        );
+
         commands
             .entity(player_ent)
             .insert((
                 MovementController { ..default() },
                 RigidBody::Dynamic, // affected by gravity/colissions
+                AngularDamping(DAMPING_FACTOR),
+                LinearDamping(DAMPING_FACTOR),
+                MaxAngularSpeed(MAX_ANGULAR_SPEED),
                 ScreenBlock,
                 PointLight2d {
                     // for firefly lighting
-                    color: Color::srgb(0.6, 0.01, 0.7),
-                    range: PLAYER_SPRITE_SIZE * SPRITE_SCALE * 4.,
-                    intensity: 1.7,
+                    color: LIGHT_COLOR,
+                    range: LIGHT_RANGE,
+                    intensity: LIGHT_INTENSITY,
                     ..default()
                 },
             ))
             .with_children(|children| {
                 // Spawn the child colliders positioned relative to the rigid body
                 children.spawn((
-                    PlayerPart,
                     Name::new("PickHead"),
                     Transform::from_xyz(0.0, 10.0, 0.0)
                         .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
                     (
                         // Capsule prevents catching on tile edges
                         Collider::capsule(3.0, 13.0),
-                        ColliderTransform {
-                            translation: Vec2::new(20., -4.),
-                            ..Default::default()
-                        },
                         CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
-                        // LockedAxes::ROTATION_LOCKED,
-                        Friction::new(0.1),
                         Restitution::new(0.5), // bounciness. 1 = perfectly elastic, 0 = no
-                        LinearVelocity::ZERO,  // start stationary
-                        CollidingEntities::default(), // track collisions
-                        GravityScale(1.0),
+                        common_things.clone(),
                     ),
                 ));
                 children.spawn((
-                    PlayerPart,
                     Name::new("Handle"),
                     Transform::from_xyz(0.0, -4.0, 0.0),
                     (
                         // Capsule prevents catching on tile edges
                         Collider::capsule(2.0, 20.0),
-                        ColliderTransform {
-                            translation: Vec2::new(20., -4.),
-                            ..Default::default()
-                        },
                         CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
-                        // LockedAxes::ROTATION_LOCKED,
-                        Friction::new(0.1),
                         Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
-                        LinearVelocity::ZERO,  // start stationary
-                        CollidingEntities::default(), // track collisions
-                        GravityScale(1.0),
+                        common_things.clone(),
                     ),
                 ));
             });

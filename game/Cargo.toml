@@ -14,6 +14,7 @@ bevy_map = { workspace = true }
 cli_template = { version = "0.1.0", path = "../cli_template" }
 rand = "0.10.0"
 avian2d = "0.6.1"
+bevy_hotpatching_experiments = "0.4.0"
 
 
 [target.wasm32-unknown-unknown.dependencies]

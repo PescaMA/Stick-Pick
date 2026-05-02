@@ -17,10 +17,10 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use cli_template::Pause;
 
-use crate::{AppSystems, PausableSystems, level::LevelBoundaries};
+use crate::{AppSystems, PausableSystems, SPRITE_SOURCE_PX, level::LevelBoundaries};
 
-pub const GRAVITY: f32 = -200.;
-const GRAVITY_CAP: f32 = -20_000.;
+pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;
+const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
 // const SOLID_LAYER: usize = 0;
 
 pub(crate) fn plugin(app: &mut App) {
@@ -109,9 +109,9 @@ fn apply_level_block(
 }
 
 fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
-    let delta_secs = time.delta_secs();
+    let _ = time.delta_secs();
     for mut linear_velocity in &mut query {
         // Accelerate the entity towards +X at `2.0` units per second squared.
-        linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP * delta_secs);
+        linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP);
     }
 }

@@ -2,8 +2,11 @@ use avian2d::prelude::{Forces, WriteRigidBodyForces};
 use bevy::{camera::ViewportConversionError, color::palettes::css::WHITE, prelude::*};
 
 use crate::{
-    SPRITE_TARGET_PX,
-    player::{movement::GRAVITY, physics::PlayerPart},
+    SPRITE_SOURCE_PX,
+    player::{
+        movement::GRAVITY,
+        physics::{PICKAXE_MASS, PlayerPart},
+    },
 };
 
 pub(crate) fn plugin(app: &mut App) {
@@ -11,37 +14,44 @@ pub(crate) fn plugin(app: &mut App) {
     app.add_systems(Update, (draw_lines, add_player_observer, end_drag));
 }
 
-/// length = 3 blocks
-const THROW_MAX_LENGTH: f32 = SPRITE_TARGET_PX * 3.;
+/// length in blocks
+const THROW_MAX_LENGTH: f32 = SPRITE_SOURCE_PX * 4.;
+const THROW_MIN_LENGTH: f32 = SPRITE_SOURCE_PX * 0.5;
 
-/// length = 0.5 blocks
-const THROW_MIN_LENGTH: f32 = SPRITE_TARGET_PX * 0.5;
-
-const THROW_MIN_SPEED: f32 = SPRITE_TARGET_PX * 1.;
-const THROW_MAX_SPEED: f32 = SPRITE_TARGET_PX * 7.;
-const THROW_BRACKET_COUNT: i32 = 10;
+const THROW_MIN_SPEED: f32 = SPRITE_SOURCE_PX * 1.;
+const THROW_MAX_SPEED: f32 = SPRITE_SOURCE_PX * 7.;
+const THROW_BRACKET_COUNT: i32 = 6;
 
 const BRACKET_SIZE: f32 = (THROW_MAX_LENGTH - THROW_MIN_LENGTH) / THROW_BRACKET_COUNT as f32;
 
+/// returns value between 0 and THROW_BRACKET_COUNT - 1
 fn get_throw_bracket_nr(distance: f32) -> f32 {
-    let distance = distance.clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH);
+    // returns bracket nr after split in [start,end). so max value must be a tad bit smaller
+    let distance = distance.clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH - 0.001);
 
-    ((distance - THROW_MIN_LENGTH - 0.001) / BRACKET_SIZE).floor()
+    ((distance - THROW_MIN_LENGTH) / BRACKET_SIZE).floor()
 }
 
-/// gets a [0,1] value and returns a [0,1] value
+/// gets a [0,1] value and returns a [0,1] value. used for smoother throwing power
 fn speed_distribution(value: f32) -> f32 {
     value
 }
 
-// fn get_throw_speed(distance: f32) -> f32 {
-//     let force_prc = get_throw_bracket_nr(distance) / (THROW_BRACKET_COUNT as f32 - 1.);
+fn get_throw_speed(distance: f32) -> f32 {
+    if THROW_BRACKET_COUNT < 2 {
+        return (THROW_MIN_SPEED + THROW_MAX_SPEED) / 2.;
+    }
+    let force_prc = get_throw_bracket_nr(distance) / (THROW_BRACKET_COUNT as f32 - 1.);
 
-//     let speed_calculation = force_prc
+    THROW_MIN_SPEED + speed_distribution(force_prc) * (THROW_MAX_SPEED - THROW_MIN_SPEED)
+}
 
-//     THROW_MIN_SPEED +
-
-// }
+fn normalize_throw_dir(dest: Vec2) -> Vec2 {
+    match dest.try_normalize() {
+        None => dest,
+        Some(dir) => dir * dest.length().clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH),
+    }
+}
 
 #[derive(Resource, Default)]
 struct PressPosition {
@@ -80,27 +90,39 @@ fn start_drag(
 ) {
     press_pos.pos = get_world2d_coords(ev.pointer_location.position, camera_query.clone()).unwrap();
     press_pos.currently_pressed = true;
-    println!("I am being pressed");
 }
 
 fn end_drag(
     mut ev_drag: MessageReader<Pointer<DragEnd>>,
+    window: Single<&Window>,
     mut press_pos: ResMut<PressPosition>,
     mut forces: Query<Forces>,
-    camera: Single<&Transform, With<Camera>>,
+    camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
     if !press_pos.currently_pressed {
         return;
     }
 
-    for drag in ev_drag.read() {
+    for _ in ev_drag.read() {
         press_pos.currently_pressed = false;
 
-        println!("drag distance:{}", drag.distance);
+        if window.cursor_position().is_none() {
+            return;
+        }
+
+        let cursor_in_screen = window.cursor_position().unwrap();
+        let cursor = get_world2d_coords(cursor_in_screen, camera_query.clone()).unwrap();
+
+        let dist = normalize_throw_dir(cursor - press_pos.pos);
 
         for mut forces in &mut forces {
-            let speed: Vec2 = camera.scale.xy() * drag.distance * GRAVITY * Vec2::new(1., -1.);
-            forces.apply_linear_impulse_at_point(speed, press_pos.pos);
+            let velocity_squared =
+                GRAVITY * 2.0 * get_throw_speed(dist.length()) * dist.normalize_or_zero();
+
+            forces.apply_linear_impulse_at_point(
+                PICKAXE_MASS * velocity_squared.map(|c| c.abs().sqrt() * c.signum()),
+                press_pos.pos,
+            );
         }
     }
 }
@@ -111,7 +133,6 @@ fn draw_lines(
     camera_query: Single<(&Camera, &GlobalTransform)>,
     mut gizmos: Gizmos,
     window: Single<&Window>,
-
     press_pos: Res<PressPosition>,
 ) {
     if !press_pos.currently_pressed || window.cursor_position().is_none() {
@@ -124,7 +145,9 @@ fn draw_lines(
     let cursor = get_world2d_coords(cursor_in_screen, camera_query.clone()).unwrap();
 
     let dest = cursor;
-    let dest_reflected = start * 2. - dest;
+    let normalized_dir = normalize_throw_dir(start - dest);
+
+    let dest_reflected = start + normalized_dir;
 
     // note: gizmos are only loaded for 1 frame.
     gizmos.line_2d(start, dest, WHITE);

@@ -16,6 +16,10 @@ const LIGHT_COLOR: Color = Color::srgb(0.556, 0.654, 0.238);
 const LIGHT_INTENSITY: f32 = 3.2;
 const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.;
 
+const HEAD_MASS: f32 = 200.;
+const HANDLE_MASS: f32 = 100.;
+pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
+
 #[derive(Component, Default, Clone)]
 pub struct PlayerPart;
 
@@ -47,6 +51,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
             .insert((
                 MovementController { ..default() },
                 RigidBody::Dynamic, // affected by gravity/colissions
+                SleepingDisabled,
                 AngularDamping(DAMPING_FACTOR),
                 LinearDamping(DAMPING_FACTOR),
                 MaxAngularSpeed(MAX_ANGULAR_SPEED),
@@ -66,6 +71,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                     Transform::from_xyz(0.0, 10.0, 0.0)
                         .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
                     (
+                        Mass(HEAD_MASS),
                         // Capsule prevents catching on tile edges
                         Collider::capsule(3.0, 13.0),
                         CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
@@ -77,6 +83,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                     Name::new("Handle"),
                     Transform::from_xyz(0.0, -4.0, 0.0),
                     (
+                        Mass(HANDLE_MASS),
                         // Capsule prevents catching on tile edges
                         Collider::capsule(2.0, 20.0),
                         CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1

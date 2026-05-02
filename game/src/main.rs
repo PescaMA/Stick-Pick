@@ -5,6 +5,7 @@
 
 use avian2d::prelude::PhysicsPickingPlugin;
 use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy_hotpatching_experiments::prelude::*;
 use cli_template::*;
 
 mod camera;
@@ -26,6 +27,7 @@ fn main() -> AppExit {
 
     // Add Bevy plugins.
     app.add_plugins((
+        SimpleSubsecondPlugin::default(), // for hotpatching
         PhysicsPickingPlugin,
         DefaultPlugins
             .set(AssetPlugin {

@@ -34,6 +34,18 @@ pub(crate) fn plugin(app: &mut App) {
             GizmoConfig::default(),
         );
     app.add_systems(Update, add_avian_body);
+    app.add_systems(Update, toggle_physics_gizmos);
+}
+fn toggle_physics_gizmos(
+    mut config_store: ResMut<GizmoConfigStore>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+) {
+    let ctrl_down =
+        keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight);
+    if ctrl_down && keyboard.just_pressed(KeyCode::KeyH) {
+        let gizmos = config_store.config_mut::<PhysicsGizmos>().0;
+        gizmos.enabled = !gizmos.enabled;
+    }
 }
 
 fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Player>>) {
@@ -43,8 +55,15 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
             LinearVelocity::ZERO,         // start stationary
             CollidingEntities::default(), // track collisions
             GravityScale(1.0),
+            DebugRender::default()
+                .with_collider_color(Color::linear_rgba(0.6, 0.4, 0.4, 0.5))
+                .with_aabb_color(Color::WHITE.with_alpha(0.)),
             Friction::new(0.3), // friction with other colliders
         );
+
+        const PICKHEAD_SIZE: Vec2 = Vec2::new(3., 13.);
+        const PICKHANDLE_SIZE: Vec2 = Vec2::new(2., 18.);
+        const DRAG_PADDING: f32 = 5.;
 
         commands
             .entity(player_ent)
@@ -66,31 +85,47 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
             ))
             .with_children(|children| {
                 // Spawn the child colliders positioned relative to the rigid body
-                children.spawn((
-                    Name::new("PickHead"),
-                    Transform::from_xyz(0.0, 10.0, 0.0)
-                        .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
-                    (
-                        Mass(HEAD_MASS),
-                        // Capsule prevents catching on tile edges
-                        Collider::capsule(3.0, 13.0),
-                        CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
-                        Restitution::new(0.5), // bounciness. 1 = perfectly elastic, 0 = no
-                        common_things.clone(),
-                    ),
-                ));
-                children.spawn((
-                    Name::new("Handle"),
-                    Transform::from_xyz(0.0, -4.0, 0.0),
-                    (
-                        Mass(HANDLE_MASS),
-                        // Capsule prevents catching on tile edges
-                        Collider::capsule(2.0, 20.0),
-                        CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
-                        Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
-                        common_things.clone(),
-                    ),
-                ));
+                children
+                    .spawn((
+                        Name::new("PickHead"),
+                        Transform::from_xyz(0.0, 10.0, 0.0)
+                            .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
+                        (
+                            Mass(HEAD_MASS),
+                            // Capsule prevents catching on tile edges
+                            Collider::capsule(PICKHEAD_SIZE.x, PICKHEAD_SIZE.y),
+                            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
+                            Restitution::new(0.5), // bounciness. 1 = perfectly elastic, 0 = no
+                            common_things.clone(),
+                        ),
+                    ))
+                    .with_children(|children1| {
+                        // Spawn the child colliders positioned relative to the rigid body
+                        children1.spawn((
+                            Sensor,
+                            Collider::capsule(PICKHEAD_SIZE.x + DRAG_PADDING, PICKHEAD_SIZE.y),
+                        ));
+                    });
+                children
+                    .spawn((
+                        Name::new("Handle"),
+                        Transform::from_xyz(0.0, -4.0, 0.0),
+                        (
+                            Mass(HANDLE_MASS),
+                            // Capsule prevents catching on tile edges
+                            Collider::capsule(PICKHANDLE_SIZE.x, PICKHANDLE_SIZE.y),
+                            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
+                            Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
+                            common_things.clone(),
+                        ),
+                    ))
+                    .with_children(|children1| {
+                        // Spawn the child colliders positioned relative to the rigid body
+                        children1.spawn((
+                            Sensor,
+                            Collider::capsule(PICKHANDLE_SIZE.x + DRAG_PADDING, PICKHANDLE_SIZE.y),
+                        ));
+                    });
             });
     }
 }

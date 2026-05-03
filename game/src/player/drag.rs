@@ -4,7 +4,7 @@ use bevy::{camera::ViewportConversionError, color::palettes::css::WHITE, prelude
 use crate::{
     SPRITE_SOURCE_PX,
     player::{
-        movement::GRAVITY,
+        movement::{GRAVITY, IgnoreSticky},
         physics::{PICKAXE_MASS, PlayerPart},
     },
 };
@@ -97,6 +97,7 @@ fn end_drag(
     window: Single<&Window>,
     mut press_pos: ResMut<PressPosition>,
     mut forces: Query<Forces>,
+    mut player: Query<&mut IgnoreSticky>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
     if !press_pos.currently_pressed {
@@ -123,6 +124,9 @@ fn end_drag(
                 PICKAXE_MASS * velocity_squared.map(|c| c.abs().sqrt() * c.signum()),
                 press_pos.pos,
             );
+        }
+        for mut player in player.iter_mut() {
+            player.time = Timer::from_seconds(0.05, TimerMode::Once);
         }
     }
 }

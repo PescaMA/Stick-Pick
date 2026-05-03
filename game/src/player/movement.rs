@@ -17,11 +17,27 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use cli_template::Pause;
 
-use crate::{AppSystems, PausableSystems, SPRITE_SOURCE_PX, level::LevelBoundaries};
+use crate::{
+    AppSystems, PausableSystems, SPRITE_SOURCE_PX,
+    level::{LevelBoundaries, ldtk_entities::Sticky},
+    player::{Player, physics::PlayerPart},
+};
 
 pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;
 const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
-// const SOLID_LAYER: usize = 0;
+
+#[derive(Component, Clone)]
+pub struct IgnoreSticky {
+    pub time: Timer,
+}
+
+impl Default for IgnoreSticky {
+    fn default() -> Self {
+        Self {
+            time: Timer::from_seconds(0., TimerMode::Once),
+        }
+    }
+}
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(
@@ -32,6 +48,7 @@ pub(crate) fn plugin(app: &mut App) {
                 apply_level_block,
                 // collide_wall,
                 gravity_cap,
+                handle_sticky_collisions,
             )
                 .chain()
                 .in_set(AppSystems::Update)
@@ -113,5 +130,52 @@ fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
     for mut linear_velocity in &mut query {
         // Accelerate the entity towards +X at `2.0` units per second squared.
         linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP);
+    }
+}
+
+fn handle_sticky_collisions(
+    head_collisions: Query<(&PlayerPart, &ChildOf, &CollidingEntities)>,
+    mut parent_speed: Query<
+        (
+            &mut LinearVelocity,
+            &mut AngularVelocity,
+            &mut GravityScale,
+            &mut IgnoreSticky,
+        ),
+        With<Player>,
+    >,
+    sticky: Query<(), With<Sticky>>,
+    time: Res<Time>,
+) {
+    for (player, parent, colliding_entities) in head_collisions {
+        if *player != PlayerPart::PickHead {
+            continue;
+        }
+
+        let Ok((mut velocity, mut angular_velocity, mut grav_scale, mut ignore_sticky)) =
+            parent_speed.get_mut(parent.parent())
+        else {
+            info!("breaking");
+            break;
+        };
+
+        ignore_sticky.time.tick(time.delta());
+        if ignore_sticky.time.just_finished() {
+            grav_scale.0 = 1.;
+        }
+
+        for entity in colliding_entities.iter() {
+            if sticky.get(*entity).is_err() {
+                continue;
+            }
+
+            if !ignore_sticky.time.is_finished() {
+                break;
+            }
+            // commands.entity(parent.parent()).insert(RigidBodyDisabled); // didn't work, it didnt reset collisions after being removed
+            *velocity = LinearVelocity::ZERO;
+            *angular_velocity = AngularVelocity::ZERO;
+            grav_scale.0 = 0.;
+        }
     }
 }

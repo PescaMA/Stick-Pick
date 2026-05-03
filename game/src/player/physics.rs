@@ -6,7 +6,7 @@ use crate::{
     SPRITE_SCALE,
     player::{
         PLAYER_SPRITE_SIZE, Player,
-        movement::{GRAVITY, MovementController, ScreenBlock},
+        movement::{GRAVITY, IgnoreSticky, MovementController, ScreenBlock},
     },
 };
 
@@ -20,8 +20,12 @@ const HEAD_MASS: f32 = 200.;
 const HANDLE_MASS: f32 = 100.;
 pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 
-#[derive(Component, Default, Clone)]
-pub struct PlayerPart;
+#[derive(Component, Default, Clone, PartialEq)]
+pub enum PlayerPart {
+    #[default]
+    PickHead,
+    PickHandle,
+}
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(Gravity(Vec2::new(0.0, GRAVITY)));
@@ -51,10 +55,8 @@ fn toggle_physics_gizmos(
 fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Player>>) {
     for player_ent in new_players.iter() {
         let common_things = (
-            PlayerPart,
             LinearVelocity::ZERO,         // start stationary
             CollidingEntities::default(), // track collisions
-            GravityScale(1.0),
             DebugRender::default()
                 .with_collider_color(Color::linear_rgba(0.6, 0.4, 0.4, 0.5))
                 .with_aabb_color(Color::WHITE.with_alpha(0.)),
@@ -68,6 +70,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
         commands
             .entity(player_ent)
             .insert((
+                GravityScale(1.0),
                 MovementController { ..default() },
                 RigidBody::Dynamic, // affected by gravity/colissions
                 SleepingDisabled,
@@ -75,6 +78,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                 LinearDamping(DAMPING_FACTOR),
                 MaxAngularSpeed(MAX_ANGULAR_SPEED),
                 ScreenBlock,
+                IgnoreSticky::default(),
                 PointLight2d {
                     // for firefly lighting
                     color: LIGHT_COLOR,
@@ -88,6 +92,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                 children
                     .spawn((
                         Name::new("PickHead"),
+                        PlayerPart::PickHead,
                         Transform::from_xyz(0.0, 10.0, 0.0)
                             .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
                         (
@@ -109,6 +114,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                 children
                     .spawn((
                         Name::new("Handle"),
+                        PlayerPart::PickHandle,
                         Transform::from_xyz(0.0, -4.0, 0.0),
                         (
                             Mass(HANDLE_MASS),

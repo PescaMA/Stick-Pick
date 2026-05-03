@@ -24,7 +24,7 @@ struct GoalBundle {
 pub struct Wall;
 
 #[derive(Default, Component)]
-struct Sticky;
+pub struct Sticky;
 
 #[derive(Default, Bundle, LdtkIntCell)]
 struct WallBundle {
@@ -42,7 +42,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_plugins(LdtkPlugin)
         .register_default_ldtk_int_cell_for_layer::<StickyBundle>("Collisions_Sticky")
         .register_default_ldtk_int_cell_for_layer::<WallBundle>("Collisions_Non_Sticky")
-        .register_ldtk_int_cell::<WallBundle>(2)
+        //.register_ldtk_int_cell::<WallBundle>(2)
         .register_ldtk_entity::<PlayerBundle>("Player")
         .register_ldtk_entity::<GoalBundle>("Goal");
 

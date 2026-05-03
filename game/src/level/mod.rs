@@ -1,6 +1,6 @@
 //! Spawn the main level.
 
-use crate::{asset_tracking::LoadResource, audio::music, screens::Screen};
+use crate::{asset_tracking::LoadResource, audio::music, player::Player, screens::Screen};
 
 // use avian2d::prelude::CollisionLayers;
 use bevy::prelude::*;
@@ -84,6 +84,7 @@ fn print_lvl_bounds(
     ldtk_project_assets: Res<Assets<LdtkProject>>,
     mut camera: Query<&mut Transform, With<Camera2d>>,
     mut level_boundary: ResMut<LevelBoundaries>,
+    player_pos: Query<&Transform, (With<Player>, Without<Camera2d>)>,
 ) -> Result {
     for level_event in level_messages.read() {
         if let LevelEvent::Spawned(level_iid) = level_event {
@@ -100,7 +101,7 @@ fn print_lvl_bounds(
             for mut camera in camera.iter_mut() {
                 camera.translation = Vec3 {
                     x: level_boundary.center_x(),
-                    y: level_boundary.center_y(),
+                    y: player_pos.iter().next().unwrap().translation.y,
                     z: camera.translation.z.clone(),
                 }
             }

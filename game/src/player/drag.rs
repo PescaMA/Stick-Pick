@@ -24,12 +24,23 @@ const THROW_BRACKET_COUNT: i32 = 6;
 
 const BRACKET_SIZE: f32 = (THROW_MAX_LENGTH - THROW_MIN_LENGTH) / THROW_BRACKET_COUNT as f32;
 
+const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
+const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
+
 /// returns value between 0 and THROW_BRACKET_COUNT - 1
 fn get_throw_bracket_nr(distance: f32) -> f32 {
     // returns bracket nr after split in [start,end). so max value must be a tad bit smaller
     let distance = distance.clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH - 0.001);
 
     ((distance - THROW_MIN_LENGTH) / BRACKET_SIZE).floor()
+}
+/// returns value between 0 and THROW_BRACKET_COUNT - 1
+fn get_throw_bracket_prc(distance: f32) -> f32 {
+    if THROW_BRACKET_COUNT < 2 {
+        return 0.;
+    }
+
+    get_throw_bracket_nr(distance) / (THROW_BRACKET_COUNT as f32 - 1.)
 }
 
 /// gets a [0,1] value and returns a [0,1] value. used for smoother throwing power
@@ -155,5 +166,12 @@ fn draw_lines(
 
     // note: gizmos are only loaded for 1 frame.
     gizmos.line_2d(start, dest, WHITE);
-    gizmos.line_2d(start, dest_reflected, WHITE);
+    gizmos.line_2d(
+        start,
+        dest_reflected,
+        COLOR_WEAK.mix(
+            &COLOR_STRONG,
+            get_throw_bracket_prc(normalized_dir.length()),
+        ),
+    );
 }

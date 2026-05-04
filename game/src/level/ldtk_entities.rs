@@ -1,4 +1,7 @@
-use avian2d::prelude::{Collider, RigidBody};
+use avian2d::{
+    collision::collider::CollisionLayers,
+    prelude::{Collider, RigidBody},
+};
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{
     app::{LdtkEntityAppExt, LdtkIntCellAppExt},
@@ -54,6 +57,7 @@ fn spawn_collider(walls: Query<Entity, Added<Wall>>, mut commands: Commands) {
         commands.entity(wall).insert((
             Collider::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX),
             RigidBody::Static,
+            CollisionLayers::from_bits(1, 2),
         ));
     }
 }

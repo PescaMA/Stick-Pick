@@ -3,6 +3,7 @@ use crate::{
     level::LevelBoundaries,
     player::{PLAYER_SPAWN_POSITION, Player},
 };
+use avian2d::picking::PhysicsPickingFilter;
 use bevy::{prelude::*, window::PrimaryWindow};
 
 use bevy_firefly::prelude::*;
@@ -26,6 +27,7 @@ fn spawn_camera(mut commands: Commands) {
         }),
         Camera2d,
         FireflyConfig::default(),
+        PhysicsPickingFilter::from_mask(2),
     ));
 }
 

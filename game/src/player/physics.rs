@@ -99,7 +99,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                             Mass(HEAD_MASS),
                             // Capsule prevents catching on tile edges
                             Collider::capsule(PICKHEAD_SIZE.x, PICKHEAD_SIZE.y),
-                            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
+                            CollisionLayers::from_bits(2, 1), // we are in layer 1 and collide with layer 1
                             Restitution::new(0.5), // bounciness. 1 = perfectly elastic, 0 = no
                             common_things.clone(),
                         ),
@@ -120,7 +120,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                             Mass(HANDLE_MASS),
                             // Capsule prevents catching on tile edges
                             Collider::capsule(PICKHANDLE_SIZE.x, PICKHANDLE_SIZE.y),
-                            CollisionLayers::from_bits(3, 3), // we are in layer 1 and collide with layer 1
+                            CollisionLayers::from_bits(2, 1), // we are in layer 1 and collide with layer 1
                             Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
                             common_things.clone(),
                         ),

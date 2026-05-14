@@ -4,15 +4,11 @@ use bevy::{camera::ViewportConversionError, color::palettes::css::WHITE, prelude
 use crate::{
     SPRITE_SOURCE_PX,
     player::{
+        drag_simulation,
         movement::{GRAVITY, IgnoreSticky},
         physics::{PICKAXE_MASS, PlayerPart},
     },
 };
-
-pub(crate) fn plugin(app: &mut App) {
-    app.insert_resource(PressPosition::default());
-    app.add_systems(Update, (draw_lines, add_player_observer, end_drag));
-}
 
 /// length in blocks
 const THROW_MAX_LENGTH: f32 = SPRITE_SOURCE_PX * 4.;
@@ -26,6 +22,18 @@ const BRACKET_SIZE: f32 = (THROW_MAX_LENGTH - THROW_MIN_LENGTH) / THROW_BRACKET_
 
 const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
 const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
+
+#[derive(Resource, Default)]
+pub struct PressPosition {
+    pub pos: Vec2,
+    pub currently_pressed: bool,
+}
+
+pub(crate) fn plugin(app: &mut App) {
+    app.insert_resource(PressPosition::default());
+    app.add_plugins(drag_simulation::plugin);
+    app.add_systems(Update, (drag_draw_lines, add_player_observer, end_drag));
+}
 
 /// returns value between 0 and THROW_BRACKET_COUNT - 1
 fn get_throw_bracket_nr(distance: f32) -> f32 {
@@ -62,12 +70,6 @@ fn normalize_throw_dir(dest: Vec2) -> Vec2 {
         None => dest,
         Some(dir) => dir * dest.length().clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH),
     }
-}
-
-#[derive(Resource, Default)]
-struct PressPosition {
-    pos: Vec2,
-    currently_pressed: bool,
 }
 
 fn add_player_observer(mut commands: Commands, new_players: Query<Entity, Added<PlayerPart>>) {
@@ -108,7 +110,7 @@ fn end_drag(
     window: Single<&Window>,
     mut press_pos: ResMut<PressPosition>,
     mut forces: Query<Forces>,
-    mut player: Query<&mut IgnoreSticky>,
+    mut player_sticky: Query<&mut IgnoreSticky>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
     if !press_pos.currently_pressed {
@@ -136,15 +138,14 @@ fn end_drag(
                 press_pos.pos,
             );
         }
-        for mut player in player.iter_mut() {
+        for mut player in player_sticky.iter_mut() {
             player.time = Timer::from_seconds(0.05, TimerMode::Once);
         }
     }
 }
 
 // note: NOT using MessageReader<Pointer<Drag>> because it updates only when moving.
-
-fn draw_lines(
+fn drag_draw_lines(
     camera_query: Single<(&Camera, &GlobalTransform)>,
     mut gizmos: Gizmos,
     window: Single<&Window>,

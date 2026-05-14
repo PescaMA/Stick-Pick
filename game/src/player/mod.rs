@@ -6,13 +6,12 @@ use bevy::{
 };
 
 pub mod drag;
+pub mod drag_simulation;
 pub mod movement;
 pub mod physics;
 
 use crate::{
-    AppSystems, PausableSystems,
-    asset_tracking::LoadResource,
-    player::{movement::MovementController, physics::apply_impulse_on_x},
+    AppSystems, PausableSystems, asset_tracking::LoadResource, player::movement::MovementController,
 };
 
 const PLAYER_SPRITE_SIZE: f32 = 32.;
@@ -26,7 +25,7 @@ pub(super) fn plugin(app: &mut App) {
     // Record directional input as movement controls.
     app.add_systems(
         Update,
-        (record_player_directional_input, apply_impulse_on_x)
+        (record_player_directional_input,)
             .in_set(AppSystems::RecordInput)
             .in_set(PausableSystems),
     );

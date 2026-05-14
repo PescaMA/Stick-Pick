@@ -60,7 +60,8 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
             DebugRender::default()
                 .with_collider_color(Color::linear_rgba(0.6, 0.4, 0.4, 0.5))
                 .with_aabb_color(Color::WHITE.with_alpha(0.)),
-            Friction::new(0.3), // friction with other colliders
+            CollisionLayers::from_bits(2, 1), // we are in layer 2 and collide with layer 1
+            Friction::new(0.3),               // friction with other colliders
         );
 
         const PICKHEAD_SIZE: Vec2 = Vec2::new(3., 13.);
@@ -97,9 +98,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                             .with_rotation(Quat::from_rotation_z(std::f32::consts::FRAC_PI_2)),
                         (
                             Mass(HEAD_MASS),
-                            // Capsule prevents catching on tile edges
-                            Collider::capsule(PICKHEAD_SIZE.x, PICKHEAD_SIZE.y),
-                            CollisionLayers::from_bits(2, 1), // we are in layer 1 and collide with layer 1
+                            Collider::capsule(PICKHEAD_SIZE.x, PICKHEAD_SIZE.y), // Capsule prevents catching on tile edges
                             Restitution::new(0.5), // bounciness. 1 = perfectly elastic, 0 = no
                             common_things.clone(),
                         ),
@@ -118,9 +117,7 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                         Transform::from_xyz(0.0, -4.0, 0.0),
                         (
                             Mass(HANDLE_MASS),
-                            // Capsule prevents catching on tile edges
-                            Collider::capsule(PICKHANDLE_SIZE.x, PICKHANDLE_SIZE.y),
-                            CollisionLayers::from_bits(2, 1), // we are in layer 1 and collide with layer 1
+                            Collider::capsule(PICKHANDLE_SIZE.x, PICKHANDLE_SIZE.y), // Capsule prevents catching on tile edges
                             Restitution::new(0.3), // bounciness. 1 = perfectly elastic, 0 = no
                             common_things.clone(),
                         ),
@@ -133,21 +130,5 @@ fn add_avian_body(mut commands: Commands, new_players: Query<Entity, Added<Playe
                         ));
                     });
             });
-    }
-}
-
-pub fn apply_impulse_on_x(
-    keyboard: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(&mut LinearVelocity, &mut AngularVelocity), With<Player>>,
-) {
-    if !keyboard.just_pressed(KeyCode::KeyX) {
-        return;
-    }
-
-    for (mut linear_velocity, mut angular_velocity) in &mut query {
-        linear_velocity.x += 200.0;
-        linear_velocity.x += 200.0;
-
-        angular_velocity.0 += 0.5;
     }
 }

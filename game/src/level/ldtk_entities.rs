@@ -52,7 +52,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, spawn_collider);
 }
 
-fn spawn_collider(walls: Query<Entity, Added<Wall>>, mut commands: Commands) {
+pub(crate) fn spawn_collider(walls: Query<Entity, Added<Wall>>, mut commands: Commands) {
     for wall in walls.iter() {
         commands.entity(wall).insert((
             Collider::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX),

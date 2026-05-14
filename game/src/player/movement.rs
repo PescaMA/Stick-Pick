@@ -146,6 +146,7 @@ fn handle_sticky_collisions(
     >,
     sticky: Query<(), With<Sticky>>,
     time: Res<Time>,
+    // mut commands: Commands,
 ) {
     for (player, parent, colliding_entities) in head_collisions {
         if *player != PlayerPart::PickHead {
@@ -162,12 +163,14 @@ fn handle_sticky_collisions(
         ignore_sticky.time.tick(time.delta());
         if ignore_sticky.time.just_finished() {
             grav_scale.0 = 1.;
+            continue;
         }
 
         for entity in colliding_entities.iter() {
             if sticky.get(*entity).is_err() {
                 continue;
             }
+            info!("sticky collision!");
 
             if !ignore_sticky.time.is_finished() {
                 break;

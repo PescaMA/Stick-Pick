@@ -6,7 +6,7 @@ use crate::{
     player::{
         drag_simulation,
         movement::{GRAVITY, IgnoreSticky},
-        physics::{PICKAXE_MASS, PlayerPart},
+        physics_bundles::{PICKAXE_MASS, PlayerPartHitbox},
     },
 };
 
@@ -72,8 +72,12 @@ fn normalize_throw_dir(dest: Vec2) -> Vec2 {
     }
 }
 
-fn add_player_observer(mut commands: Commands, new_players: Query<Entity, Added<PlayerPart>>) {
+fn add_player_observer(
+    mut commands: Commands,
+    new_players: Query<Entity, Added<PlayerPartHitbox>>,
+) {
     for player_ent in new_players {
+        info!("new player,");
         commands.entity(player_ent).observe(start_drag);
     }
 }
@@ -102,7 +106,7 @@ fn start_drag(
     camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
     press_pos.pos = get_world2d_coords(ev.pointer_location.position, camera_query.clone()).unwrap();
-    press_pos.currently_pressed = true;
+    press_pos.currently_pressed = !press_pos.currently_pressed;
 }
 
 fn end_drag(

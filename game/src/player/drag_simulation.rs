@@ -2,11 +2,8 @@ use std::time::Duration;
 
 use avian2d::{
     PhysicsPlugins,
-    collision::collider::{Collider, CollidingEntities},
-    dynamics::{
-        integrator::Gravity,
-        rigid_body::{LinearVelocity, RigidBody},
-    },
+    collision::collider::Collider,
+    dynamics::{integrator::Gravity, rigid_body::RigidBody},
     schedule::PhysicsSchedule,
 };
 use bevy::{prelude::*, time::TimePlugin};
@@ -14,7 +11,7 @@ use bevy_ecs_ldtk::LdtkProjectHandle;
 
 use crate::{
     level::ldtk_entities::spawn_collider,
-    player::{Player, drag::PressPosition, movement::GRAVITY, physics::PlayerPart},
+    player::{Player, drag::PressPosition, movement::GRAVITY, physics::add_avian_body},
 };
 
 const PREDICT_TIME_S: f32 = 2.0;
@@ -91,11 +88,7 @@ fn init_world(world: &mut World) {
         let mut builder = sim_world.world.spawn_empty();
         if let Some(player) = player_opt {
             info!("WE HAVE PLAYERSSS");
-            // builder.insert((
-            //     player,
-            //     LinearVelocity::ZERO, // start stationary
-            //     CollidingEntities::default(),
-            // ));
+            builder.insert(player);
             continue;
         }
         if let Some(rig) = rig_opt {
@@ -109,6 +102,9 @@ fn init_world(world: &mut World) {
             info!("transform: {}, {}", tr.translation, tr.rotation);
         }
     }
+
+    let add_player = sim_world.world.register_system(add_avian_body);
+    // let _ = sim_world.world.run_system(add_player);
 
     info!("new world size: {}", sim_world.world.entity_count());
 
@@ -135,7 +131,7 @@ fn drag_physics_predict(
         return;
     }
 
-    let mut sim_world = &mut sim_world.world;
+    let sim_world = &mut sim_world.world;
 
     info!("in predict: ");
 

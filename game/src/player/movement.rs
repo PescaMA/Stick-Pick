@@ -20,7 +20,7 @@ use cli_template::Pause;
 use crate::{
     AppSystems, PausableSystems, SPRITE_SOURCE_PX,
     level::{LevelBoundaries, ldtk_entities::Sticky},
-    player::{Player, physics::PlayerPart},
+    player::{Player, physics_bundles::PlayerPart},
 };
 
 pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;

@@ -9,6 +9,7 @@ pub mod drag;
 pub mod drag_simulation;
 pub mod movement;
 pub mod physics;
+mod physics_bundles;
 
 use crate::{
     AppSystems, PausableSystems, asset_tracking::LoadResource, player::movement::MovementController,

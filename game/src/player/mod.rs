@@ -6,6 +6,7 @@ use bevy::{
 };
 
 pub mod drag;
+pub mod drag_helper;
 pub mod drag_simulation;
 pub mod movement;
 pub mod physics;

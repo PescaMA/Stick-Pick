@@ -1,29 +1,14 @@
 use avian2d::prelude::{Forces, WriteRigidBodyForces};
-use bevy::{camera::ViewportConversionError, color::palettes::css::WHITE, prelude::*};
+use bevy::{color::palettes::css::WHITE, prelude::*};
 
-use crate::{
-    SPRITE_SOURCE_PX,
-    player::{
-        drag_simulation,
-        movement::{GRAVITY, IgnoreSticky},
-        physics_bundles::{PICKAXE_MASS, PlayerPartHitbox},
-    },
+use crate::player::{
+    drag_helper::*, drag_simulation, movement::IgnoreSticky, physics_bundles::PlayerPartHitbox,
 };
-
-/// length in blocks
-const THROW_MAX_LENGTH: f32 = SPRITE_SOURCE_PX * 4.;
-const THROW_MIN_LENGTH: f32 = SPRITE_SOURCE_PX * 0.5;
-
-const THROW_MIN_SPEED: f32 = SPRITE_SOURCE_PX * 1.;
-const THROW_MAX_SPEED: f32 = SPRITE_SOURCE_PX * 7.;
-const THROW_BRACKET_COUNT: i32 = 6;
-
-const BRACKET_SIZE: f32 = (THROW_MAX_LENGTH - THROW_MIN_LENGTH) / THROW_BRACKET_COUNT as f32;
 
 const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
 const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
 
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Clone)]
 pub struct PressPosition {
     pub pos: Vec2,
     pub currently_pressed: bool,
@@ -32,44 +17,10 @@ pub struct PressPosition {
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(PressPosition::default());
     app.add_plugins(drag_simulation::plugin);
-    app.add_systems(Update, (drag_draw_lines, add_player_observer, end_drag));
-}
-
-/// returns value between 0 and THROW_BRACKET_COUNT - 1
-fn get_throw_bracket_nr(distance: f32) -> f32 {
-    // returns bracket nr after split in [start,end). so max value must be a tad bit smaller
-    let distance = distance.clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH - 0.001);
-
-    ((distance - THROW_MIN_LENGTH) / BRACKET_SIZE).floor()
-}
-/// returns value between 0 and THROW_BRACKET_COUNT - 1
-fn get_throw_bracket_prc(distance: f32) -> f32 {
-    if THROW_BRACKET_COUNT < 2 {
-        return 0.;
-    }
-
-    get_throw_bracket_nr(distance) / (THROW_BRACKET_COUNT as f32 - 1.)
-}
-
-/// gets a [0,1] value and returns a [0,1] value. used for smoother throwing power
-fn speed_distribution(value: f32) -> f32 {
-    value
-}
-
-fn get_throw_speed(distance: f32) -> f32 {
-    if THROW_BRACKET_COUNT < 2 {
-        return (THROW_MIN_SPEED + THROW_MAX_SPEED) / 2.;
-    }
-    let force_prc = get_throw_bracket_nr(distance) / (THROW_BRACKET_COUNT as f32 - 1.);
-
-    THROW_MIN_SPEED + speed_distribution(force_prc) * (THROW_MAX_SPEED - THROW_MIN_SPEED)
-}
-
-fn normalize_throw_dir(dest: Vec2) -> Vec2 {
-    match dest.try_normalize() {
-        None => dest,
-        Some(dir) => dir * dest.length().clamp(THROW_MIN_LENGTH, THROW_MAX_LENGTH),
-    }
+    app.add_systems(
+        Update,
+        (drag_draw_lines, add_player_observer, end_drag, cancel_drag),
+    );
 }
 
 fn add_player_observer(
@@ -77,31 +28,18 @@ fn add_player_observer(
     new_players: Query<Entity, Added<PlayerPartHitbox>>,
 ) {
     for player_ent in new_players {
-        info!("new player,");
         commands.entity(player_ent).observe(start_drag);
     }
 }
 
-/// Converts a screen-space position to world-space (2D) using a camera's transform.
-///
-/// The system that calls this function must have a parameter:
-///
-/// `camera_query: Single<(&Camera, &GlobalTransform)>,`
-///
-/// and then call this function like:
-///
-/// `get_world2d_coords(ev.distance, camera_query.clone()).unwrap();`
-///
-fn get_world2d_coords(
-    pos: Vec2,
-    camera_query: (&Camera, &GlobalTransform),
-) -> Result<Vec2, ViewportConversionError> {
-    let (camera, camera_transform) = camera_query;
-    camera.viewport_to_world_2d(camera_transform, pos)
+fn cancel_drag(buttons: Res<ButtonInput<MouseButton>>, mut press_pos: ResMut<PressPosition>) {
+    if buttons.just_pressed(MouseButton::Right) {
+        press_pos.currently_pressed = false;
+    }
 }
 
 fn start_drag(
-    ev: On<Pointer<Press>>,
+    ev: On<Pointer<DragStart>>,
     mut press_pos: ResMut<PressPosition>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
@@ -109,7 +47,7 @@ fn start_drag(
     press_pos.currently_pressed = !press_pos.currently_pressed;
 }
 
-fn end_drag(
+pub fn end_drag(
     mut ev_drag: MessageReader<Pointer<DragEnd>>,
     window: Single<&Window>,
     mut press_pos: ResMut<PressPosition>,
@@ -121,30 +59,19 @@ fn end_drag(
         return;
     }
 
-    for _ in ev_drag.read() {
+    if ev_drag.read().len() > 0 {
         press_pos.currently_pressed = false;
 
-        if window.cursor_position().is_none() {
-            return;
-        }
-
-        let cursor_in_screen = window.cursor_position().unwrap();
-        let cursor = get_world2d_coords(cursor_in_screen, camera_query.clone()).unwrap();
-
-        let dist = normalize_throw_dir(cursor - press_pos.pos);
-
+        let impulse_pos = press_pos.pos;
+        let impulse_velocity = get_throw_distance(window, press_pos.into(), camera_query).unwrap();
         for mut forces in &mut forces {
-            let velocity_squared =
-                GRAVITY * 2.0 * get_throw_speed(dist.length()) * dist.normalize_or_zero();
-
-            forces.apply_linear_impulse_at_point(
-                PICKAXE_MASS * velocity_squared.map(|c| c.abs().sqrt() * c.signum()),
-                press_pos.pos,
-            );
+            forces.apply_linear_impulse_at_point(impulse_velocity, impulse_pos);
         }
         for mut player in player_sticky.iter_mut() {
             player.time = Timer::from_seconds(0.05, TimerMode::Once);
         }
+
+        info!("ACTRUALLY apply {} at {}", impulse_velocity, impulse_pos);
     }
 }
 
@@ -165,12 +92,18 @@ fn drag_draw_lines(
     let cursor = get_world2d_coords(cursor_in_screen, camera_query.clone()).unwrap();
 
     let dest = cursor;
+
+    gizmos.line_2d(start, dest, WHITE);
+
+    if (start - dest).length() < THROW_MIN_LENGTH {
+        return;
+    }
+
     let normalized_dir = normalize_throw_dir(start - dest);
 
     let dest_reflected = start + normalized_dir;
 
     // note: gizmos are only loaded for 1 frame.
-    gizmos.line_2d(start, dest, WHITE);
     gizmos.line_2d(
         start,
         dest_reflected,

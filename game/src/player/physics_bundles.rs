@@ -77,6 +77,7 @@ pub struct CommonPlayerPartBundle {
     pub debug_render: DebugRender,
     pub collision_layers: CollisionLayers,
     pub friction: Friction,
+    pub pickable: Pickable,
 }
 impl Default for CommonPlayerPartBundle {
     fn default() -> Self {
@@ -88,6 +89,7 @@ impl Default for CommonPlayerPartBundle {
                 .with_aabb_color(Color::WHITE.with_alpha(0.0)),
             collision_layers: CollisionLayers::from_bits(2, 1), // we are in layer 2 and collide with layer 1
             friction: Friction::new(0.3),                       // friction with other colliders
+            pickable: Pickable::IGNORE,
         }
     }
 }

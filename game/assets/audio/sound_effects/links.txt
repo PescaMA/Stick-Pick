@@ -1,0 +1,8 @@
+CC0
+
+pickaxe:
+https://freesound.org/people/NoisyRedFox/sounds/760567/
+https://freesound.org/people/igroglaz/sounds/593897/
+
+throw:
+https://freesound.org/people/SypherZent/sounds/420668/

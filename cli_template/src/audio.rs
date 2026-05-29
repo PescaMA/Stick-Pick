@@ -38,7 +38,10 @@ fn apply_global_volume(
     global_volume: Res<GlobalVolume>,
     mut audio_query: Query<(&PlaybackSettings, &mut AudioSink)>,
 ) {
+    let loudness = (global_volume.volume.to_linear() * 10.).round() / 10.;
+    let volume = bevy::audio::Volume::Linear(loudness);
+
     for (playback, mut sink) in &mut audio_query {
-        sink.set_volume(global_volume.volume * playback.volume);
+        sink.set_volume(volume * playback.volume);
     }
 }

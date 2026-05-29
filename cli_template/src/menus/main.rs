@@ -2,9 +2,32 @@
 
 use bevy::prelude::*;
 
-use crate::{asset_tracking::ResourceHandles, menus::Menu, screens::Screen, theme::widget};
+use crate::{
+    asset_tracking::{LoadResource, ResourceHandles},
+    audio::music,
+    menus::Menu,
+    screens::Screen,
+    theme::widget,
+};
+
+#[derive(Resource, Asset, Clone, Reflect)]
+#[reflect(Resource)]
+struct MenusAssets {
+    #[dependency]
+    music: Handle<AudioSource>,
+}
+impl FromWorld for MenusAssets {
+    fn from_world(world: &mut World) -> Self {
+        let assets = world.resource::<AssetServer>();
+        Self {
+            music: assets.load("audio/music/main_menu_igorchagas.ogg"),
+        }
+    }
+}
 
 pub(super) fn plugin(app: &mut App) {
+    app.load_resource::<MenusAssets>();
+    app.add_systems(OnEnter(Menu::Main), start_menu_music);
     app.add_systems(OnEnter(Menu::Main), spawn_main_menu);
 }
 
@@ -52,4 +75,22 @@ fn open_credits_menu(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu
 #[cfg(not(target_family = "wasm"))]
 fn exit_app(_: On<Pointer<Click>>, mut app_exit: MessageWriter<AppExit>) {
     app_exit.write(AppExit::Success);
+}
+
+fn start_menu_music(
+    mut commands: Commands,
+    existing_music: Query<&AudioPlayer>,
+    menus_music: Res<MenusAssets>,
+) {
+    for music in existing_music {
+        if music.0 == menus_music.music {
+            return;
+        }
+    }
+
+    commands.spawn((
+        Name::new("Credits Music"),
+        DespawnOnEnter(Screen::Gameplay),
+        music(menus_music.music.clone()),
+    ));
 }

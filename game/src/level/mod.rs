@@ -53,7 +53,7 @@ impl FromWorld for LevelAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();
         Self {
-            music: assets.load("audio/music/Fluffing A Duck.ogg"),
+            music: assets.load("audio/music/game_seth.ogg"),
         }
     }
 }
@@ -78,7 +78,7 @@ pub fn spawn_level(
     ),));
 }
 
-fn print_lvl_bounds(
+pub fn print_lvl_bounds(
     mut level_messages: MessageReader<LevelEvent>,
     ldtk_project_entities: Query<&LdtkProjectHandle>,
     ldtk_project_assets: Res<Assets<LdtkProject>>,

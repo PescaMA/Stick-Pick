@@ -7,7 +7,7 @@ use bevy::{
 
 pub mod drag;
 pub mod drag_helper;
-pub mod drag_simulation;
+// pub mod drag_simulation;
 pub mod movement;
 pub mod physics;
 mod physics_bundles;
@@ -80,7 +80,7 @@ impl FromWorld for PlayerAssets {
         let assets = world.resource::<AssetServer>();
         Self {
             image: assets.load_with_settings(
-                "images/ducky.png",
+                "images/pickaxe.png",
                 |settings: &mut ImageLoaderSettings| {
                     // Use `nearest` image sampling to preserve pixel art style.
                     settings.sampler = ImageSampler::nearest();

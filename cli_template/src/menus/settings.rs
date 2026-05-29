@@ -6,7 +6,35 @@ use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude:
 
 use crate::{menus::Menu, screens::Screen, theme::prelude::*};
 
+#[derive(Resource)]
+struct VolumeTimer {
+    timer: Timer,
+    active: bool,
+    volume_change: f32,
+}
+
+impl Default for VolumeTimer {
+    fn default() -> Self {
+        Self {
+            timer: Timer::from_seconds(VOLUME_CHANGE_PER_SEC / 10., TimerMode::Repeating),
+            active: false,
+            volume_change: 0.,
+        }
+    }
+}
+
+impl VolumeTimer {
+    fn reset(&mut self, change: f32) {
+        self.timer.reset();
+        self.active = true;
+        self.volume_change = change;
+    }
+}
+
+const VOLUME_CHANGE_PER_SEC: f32 = 1.0;
+
 pub(super) fn plugin(app: &mut App) {
+    app.insert_resource(VolumeTimer::default());
     app.add_systems(OnEnter(Menu::Settings), spawn_settings_menu);
     app.add_systems(
         Update,
@@ -15,7 +43,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        update_global_volume_label.run_if(in_state(Menu::Settings)),
+        (update_global_volume_label, hold_volume).run_if(in_state(Menu::Settings)),
     );
 }
 
@@ -81,14 +109,44 @@ fn global_volume_widget() -> impl Bundle {
 const MIN_VOLUME: f32 = 0.0;
 const MAX_VOLUME: f32 = 3.0;
 
-fn lower_global_volume(_: On<Pointer<Click>>, mut global_volume: ResMut<GlobalVolume>) {
+fn lower_global_volume(
+    _: On<Pointer<Press>>,
+    mut global_volume: ResMut<GlobalVolume>,
+    mut volume: ResMut<VolumeTimer>,
+) {
+    volume.reset(-0.1);
     let linear = (global_volume.volume.to_linear() - 0.1).max(MIN_VOLUME);
     global_volume.volume = Volume::Linear(linear);
 }
 
-fn raise_global_volume(_: On<Pointer<Click>>, mut global_volume: ResMut<GlobalVolume>) {
+fn raise_global_volume(
+    _: On<Pointer<Press>>,
+    mut global_volume: ResMut<GlobalVolume>,
+    mut volume: ResMut<VolumeTimer>,
+) {
+    volume.reset(0.1);
     let linear = (global_volume.volume.to_linear() + 0.1).min(MAX_VOLUME);
     global_volume.volume = Volume::Linear(linear);
+}
+
+fn hold_volume(
+    interactions: Query<&Interaction>,
+    mut volume: ResMut<VolumeTimer>,
+    mut global_volume: ResMut<GlobalVolume>,
+    time: Res<Time>,
+) {
+    for interaction in interactions {
+        match *interaction {
+            Interaction::Pressed => {
+                if volume.timer.tick(time.delta()).just_finished() {
+                    let mut new_volume = global_volume.volume.to_linear() + volume.volume_change;
+                    new_volume = new_volume.min(MAX_VOLUME).max(MIN_VOLUME);
+                    global_volume.volume = Volume::Linear(new_volume);
+                }
+            }
+            _ => {}
+        }
+    }
 }
 
 #[derive(Component, Reflect)]

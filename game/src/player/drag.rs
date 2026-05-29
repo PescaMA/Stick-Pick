@@ -1,9 +1,7 @@
 use avian2d::prelude::{Forces, WriteRigidBodyForces};
 use bevy::{color::palettes::css::WHITE, prelude::*};
 
-use crate::player::{
-    drag_helper::*, drag_simulation, movement::IgnoreSticky, physics_bundles::PlayerPartHitbox,
-};
+use crate::player::{drag_helper::*, movement::IgnoreSticky, physics_bundles::PlayerPartHitbox};
 
 const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
 const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
@@ -16,7 +14,7 @@ pub struct PressPosition {
 
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(PressPosition::default());
-    app.add_plugins(drag_simulation::plugin);
+    // app.add_plugins(drag_simulation::plugin);
     app.add_systems(
         Update,
         (drag_draw_lines, add_player_observer, end_drag, cancel_drag),

@@ -15,10 +15,13 @@ cli_template = { version = "0.1.0", path = "../cli_template" }
 rand = "0.10.0"
 avian2d = "0.6.1"
 bevy_hotpatching_experiments = "0.4.0"
+winit = "0.30.13"
+image = "0.25.10"
 
 
 [target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom = { version = "0.2", features = ["js"] }
+
 
 [features]
 # Default to a native dev build.

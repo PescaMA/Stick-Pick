@@ -4,9 +4,10 @@
 //! to get a feeling for the template.
 
 use avian2d::prelude::PhysicsPickingPlugin;
-use bevy::{asset::AssetMetaCheck, prelude::*};
+use bevy::{asset::AssetMetaCheck, ecs::system::NonSendMarker, prelude::*};
 use bevy_hotpatching_experiments::prelude::*;
 use cli_template::*;
+use winit::window::Icon;
 
 mod camera;
 
@@ -19,6 +20,32 @@ const SPRITE_SCALE: f32 = SPRITE_TARGET_PX / SPRITE_SOURCE_PX;
 
 pub fn plugin(app: &mut App) {
     app.add_plugins((level::plugin, player::plugin, camera::plugin));
+}
+
+fn set_window_icon(
+    // we have to run from main thread
+    _: NonSendMarker,
+) {
+    // here we use the `image` crate to load our icon data from a png file
+    // this is not a very bevy-native solution, but it will do
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::open("game/assets/images/pickaxe.png")
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
+
+    bevy::winit::WINIT_WINDOWS.with_borrow_mut(|winit_windows| {
+        if winit_windows.windows.is_empty() {
+            return;
+        }
+        for window in winit_windows.windows.values() {
+            window.set_window_icon(Some(icon.clone()));
+        }
+    });
 }
 
 fn main() -> AppExit {
@@ -49,5 +76,7 @@ fn main() -> AppExit {
     ));
 
     app.add_plugins(AppPlugin);
-    app.add_plugins(plugin).run()
+    app.add_plugins(plugin);
+    app.add_systems(Startup, set_window_icon);
+    app.run()
 }

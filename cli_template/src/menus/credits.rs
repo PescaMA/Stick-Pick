@@ -43,14 +43,14 @@ pub fn assets() -> impl Bundle {
         ["Pickaxe (100 Item Pack)", "by Furkan Duran"],
         ["Button SFX", "CC0 by Jaszunio15"],
         [
-            "Gameplay",
+            "Gameplay Music",
             "Determined Video Game Music by Seth_Makes_Sounds",
         ],
-        ["Main Menu", "Enigmatic Polyphony by IgorChagas"],
+        ["Main Menu Music", "Enigmatic Polyphony by IgorChagas"],
     ])
 }
 
-pub fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
+pub fn grid<const N: usize>(content: Vec<[&'static str; N]>) -> impl Bundle {
     (
         Name::new("Grid"),
         Node {
@@ -59,7 +59,7 @@ pub fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
             overflow: Overflow::scroll(),
             row_gap: px(10),
             column_gap: px(10),
-            grid_template_columns: RepeatedGridTrack::px(2, HORIZONTAL_SIZE / 2.),
+            grid_template_columns: RepeatedGridTrack::px(N, HORIZONTAL_SIZE / N as f32),
             ..default()
         },
         Children::spawn(SpawnIter(content.into_iter().flatten().enumerate().map(
@@ -67,6 +67,7 @@ pub fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
                 (
                     widget::label(text),
                     Node {
+                        // overflow: Overflow::scroll_y(),
                         justify_self: if i.is_multiple_of(2) {
                             JustifySelf::End
                         } else {
@@ -87,4 +88,3 @@ fn go_back_on_click(_: On<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>
 fn go_back(mut next_menu: ResMut<NextState<Menu>>) {
     next_menu.set(Menu::Main);
 }
-

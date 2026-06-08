@@ -6,6 +6,9 @@ use bevy::{ecs::system::IntoObserverSystem, prelude::*};
 
 use crate::theme::{interaction::InteractionPalette, palette::*};
 
+const MENU_FONT_SIZE: f32 = 40.;
+const TEXT_FONT_SIZE: f32 = 24.;
+
 /// A root UI node that fills the window and centers its content.
 pub fn ui_root(name: impl Into<Cow<'static, str>>) -> impl Bundle {
     (
@@ -30,7 +33,7 @@ pub fn header(text: impl Into<String>) -> impl Bundle {
     (
         Name::new("Header"),
         Text(text.into()),
-        TextFont::from_font_size(40.0),
+        TextFont::from_font_size(MENU_FONT_SIZE),
         TextColor(HEADER_TEXT),
     )
 }
@@ -40,7 +43,7 @@ pub fn label(text: impl Into<String>) -> impl Bundle {
     (
         Name::new("Label"),
         Text(text.into()),
-        TextFont::from_font_size(24.0),
+        TextFont::from_font_size(TEXT_FONT_SIZE),
         TextColor(LABEL_TEXT),
     )
 }
@@ -116,7 +119,7 @@ where
                     children![(
                         Name::new("Button Text"),
                         Text(text),
-                        TextFont::from_font_size(40.0),
+                        TextFont::from_font_size(MENU_FONT_SIZE),
                         TextColor(BUTTON_TEXT),
                         // Don't bubble picking events from the text up to the button.
                         Pickable::IGNORE,

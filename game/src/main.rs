@@ -5,7 +5,10 @@
 
 use avian2d::prelude::PhysicsPickingPlugin;
 use bevy::{asset::AssetMetaCheck, ecs::system::NonSendMarker, prelude::*};
+
+#[cfg(feature = "dev_native")]
 use bevy_hotpatching_experiments::prelude::*;
+
 use cli_template::*;
 use winit::window::Icon;
 
@@ -54,6 +57,7 @@ fn main() -> AppExit {
 
     // Add Bevy plugins.
     app.add_plugins((
+        #[cfg(feature = "dev_native")]
         SimpleSubsecondPlugin::default(), // for hotpatching
         PhysicsPickingPlugin,
         DefaultPlugins

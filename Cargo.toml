@@ -3,12 +3,15 @@ members = ["game", "cli_template"]
 resolver = "3"
 
 [workspace.dependencies]
-bevy = { version = "0.18", features = ["webgpu", "web"] }
+bevy = { version = "0.18", default-features = false, features = [
+    "2d",
+    "webgpu",
+    "web",
+] }
 bevy_ecs_ldtk = "0.14.0"
 bevy-inspector-egui = "0.36.0"
 bevy_ecs_tilemap = "0.18.1"
 bevy_firefly = "0.18.0"
-bevy_map = { version = "0.5", features = ["physics"] }
 
 # Enable a small amount of optimization in the dev profile.
 [profile.dev]

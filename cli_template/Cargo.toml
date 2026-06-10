@@ -9,15 +9,14 @@ bevy_ecs_ldtk = { workspace = true }
 bevy-inspector-egui = { workspace = true }
 bevy_ecs_tilemap = { workspace = true }
 bevy_firefly = { workspace = true }
-bevy_map = { workspace = true }
-
 
 [target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.3", features = ["wasm_js"] }
+getrandom_v2 = { version = "0.2", features = ["js"], package = "getrandom" }
+getrandom = { version = "0.4", features = ["wasm_js"] }
 
 [features]
 # Default to a native dev build.
-default = ["dev_native"]
+default = ["dev"]
 dev = [
     # Improve compile times for dev builds by linking Bevy as a dynamic library.
     "bevy/dynamic_linking",

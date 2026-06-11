@@ -11,7 +11,10 @@ pub(crate) fn plugin(app: &mut App) {
                 aabb_color: Some(Color::WHITE),
                 ..default()
             },
-            GizmoConfig::default(),
+            GizmoConfig {
+                enabled: false,
+                ..default()
+            },
         );
     app.add_systems(Update, add_avian_body);
     app.add_systems(Update, toggle_physics_gizmos);

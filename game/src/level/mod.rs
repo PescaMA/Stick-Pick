@@ -29,9 +29,9 @@ impl LevelBoundaries {
     pub fn center_x(&self) -> f32 {
         return self.origin.x + self.length.x / 2.;
     }
-    pub fn center_y(&self) -> f32 {
-        return self.origin.y + self.length.y / 2.;
-    }
+    // pub fn center_y(&self) -> f32 {
+    //     return self.origin.y + self.length.y / 2.;
+    // }
 }
 
 pub(super) fn plugin(app: &mut App) {

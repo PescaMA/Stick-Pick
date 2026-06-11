@@ -15,14 +15,14 @@ pub const HANDLE_MASS: f32 = 100.;
 pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 
 const DAMPING_FACTOR: f32 = 0.5;
-const MAX_ANGULAR_SPEED: f32 = 12.;
+const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
 const LIGHT_COLOR: Color = Color::srgb(0.556, 0.654, 0.238);
 const LIGHT_INTENSITY: f32 = 3.2;
 const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.;
 
-const PICKHEAD_SIZE: Vec2 = Vec2::new(3., 13.);
-const PICKHANDLE_SIZE: Vec2 = Vec2::new(2., 18.);
-const DRAG_PADDING: f32 = 5.;
+const PICKHEAD_SIZE: Vec2 = Vec2::new(2., 12.);
+const PICKHANDLE_SIZE: Vec2 = Vec2::new(2., 16.);
+const DRAG_PADDING: f32 = 6.;
 
 #[derive(Component, Default, Clone, PartialEq)]
 pub enum PlayerPart {
@@ -57,7 +57,7 @@ impl Default for PlayerBundle {
             sleeping_disabled: SleepingDisabled,
             angular_damping: AngularDamping(DAMPING_FACTOR),
             linear_damping: LinearDamping(DAMPING_FACTOR),
-            max_angular_speed: MaxAngularSpeed(MAX_ANGULAR_SPEED),
+            max_angular_speed: MaxAngularSpeed(MAX_ANGULAR_SPEED_RADIANS),
             screen_block: ScreenBlock,
             ignore_sticky: IgnoreSticky::default(),
             point_light: PointLight2d {
@@ -74,6 +74,7 @@ impl Default for PlayerBundle {
 pub struct CommonPlayerPartBundle {
     pub linear_velocity: LinearVelocity,
     pub colliding_entities: CollidingEntities,
+    pub collision_events: CollisionEventsEnabled,
     pub debug_render: DebugRender,
     pub collision_layers: CollisionLayers,
     pub friction: Friction,
@@ -84,6 +85,7 @@ impl Default for CommonPlayerPartBundle {
         Self {
             linear_velocity: LinearVelocity::ZERO, // start stationary
             colliding_entities: CollidingEntities::default(), // track collisions
+            collision_events: CollisionEventsEnabled,
             debug_render: DebugRender::default()
                 .with_collider_color(Color::linear_rgba(0.6, 0.4, 0.4, 0.5))
                 .with_aabb_color(Color::WHITE.with_alpha(0.0)),

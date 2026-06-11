@@ -29,12 +29,20 @@ const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
 #[derive(Component, Clone)]
 pub struct IgnoreSticky {
     pub time: Timer,
+    pub has_hit_sticky: bool,
+}
+impl IgnoreSticky {
+    pub fn reset(&mut self) {
+        self.time = Timer::from_seconds(0.05, TimerMode::Once);
+        self.has_hit_sticky = false;
+    }
 }
 
 impl Default for IgnoreSticky {
     fn default() -> Self {
         Self {
             time: Timer::from_seconds(0., TimerMode::Once),
+            has_hit_sticky: false,
         }
     }
 }
@@ -81,8 +89,8 @@ fn apply_movement(
 ) {
     for (controller, mut velo) in &mut movement_query {
         let velocity = controller.intent;
-        velo.x += velocity.x * time.delta_secs() * -GRAVITY * 1.2;
-        velo.y += velocity.y * time.delta_secs() * -GRAVITY * 1.2;
+        velo.x += velocity.x * time.delta_secs() * -GRAVITY * 2.;
+        velo.y += velocity.y * time.delta_secs() * -GRAVITY * 2.;
 
         // info!("speed: {}", velo.y);
     }
@@ -133,7 +141,7 @@ fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
     }
 }
 
-fn handle_sticky_collisions(
+pub(crate) fn handle_sticky_collisions(
     head_collisions: Query<(&PlayerPart, &ChildOf, &CollidingEntities)>,
     mut parent_speed: Query<
         (
@@ -156,7 +164,6 @@ fn handle_sticky_collisions(
         let Ok((mut velocity, mut angular_velocity, mut grav_scale, mut ignore_sticky)) =
             parent_speed.get_mut(parent.parent())
         else {
-            info!("breaking");
             break;
         };
 
@@ -164,6 +171,13 @@ fn handle_sticky_collisions(
         if ignore_sticky.time.just_finished() {
             grav_scale.0 = 1.;
             continue;
+        }
+
+        // stop speed after collission
+        if colliding_entities.is_empty() && ignore_sticky.has_hit_sticky {
+            *velocity = LinearVelocity::ZERO;
+            *angular_velocity = AngularVelocity::ZERO;
+            grav_scale.0 = 0.;
         }
 
         for entity in colliding_entities.iter() {
@@ -175,10 +189,7 @@ fn handle_sticky_collisions(
             if !ignore_sticky.time.is_finished() {
                 break;
             }
-            // commands.entity(parent.parent()).insert(RigidBodyDisabled); // didn't work, it didnt reset collisions after being removed
-            *velocity = LinearVelocity::ZERO;
-            *angular_velocity = AngularVelocity::ZERO;
-            grav_scale.0 = 0.;
+            ignore_sticky.has_hit_sticky = true;
         }
     }
 }

@@ -5,12 +5,11 @@ use bevy::{
     prelude::*,
 };
 
-pub mod drag;
-pub mod drag_helper;
 // pub mod drag_simulation;
 pub mod movement;
 pub mod physics;
-mod physics_bundles;
+pub mod physics_bundles;
+pub mod sounds;
 
 use crate::{
     AppSystems, PausableSystems, asset_tracking::LoadResource, player::movement::MovementController,
@@ -22,7 +21,7 @@ pub const PLAYER_SPAWN_POSITION: Vec3 = vec3(100., 30., 1.);
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<PlayerAssets>();
 
-    app.add_plugins((physics::plugin, movement::plugin, drag::plugin));
+    app.add_plugins((physics::plugin, movement::plugin, sounds::plugin));
 
     // Record directional input as movement controls.
     app.add_systems(
@@ -73,6 +72,8 @@ pub struct PlayerAssets {
     image: Handle<Image>,
     #[dependency]
     pub throw_sound: Vec<Handle<AudioSource>>,
+    pub hit_sticky_sound: Vec<Handle<AudioSource>>,
+    pub hit_non_sticky_sound: Vec<Handle<AudioSource>>,
 }
 
 impl FromWorld for PlayerAssets {
@@ -86,12 +87,9 @@ impl FromWorld for PlayerAssets {
                     settings.sampler = ImageSampler::nearest();
                 },
             ),
-            throw_sound: vec![
-                assets.load("audio/sound_effects/step1.ogg"),
-                assets.load("audio/sound_effects/step2.ogg"),
-                assets.load("audio/sound_effects/step3.ogg"),
-                assets.load("audio/sound_effects/step4.ogg"),
-            ],
+            throw_sound: vec![assets.load("audio/sound_effects/throw_sypherzent.wav")],
+            hit_sticky_sound: vec![assets.load("audio/sound_effects/pickaxe_igroglaz.mp3")],
+            hit_non_sticky_sound: vec![assets.load("audio/sound_effects/pickaxe_noisyredfox.ogg")],
         }
     }
 }

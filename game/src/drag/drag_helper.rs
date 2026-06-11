@@ -1,6 +1,7 @@
 use crate::{
     SPRITE_SOURCE_PX,
-    player::{drag::PressPosition, movement::GRAVITY, physics_bundles::PICKAXE_MASS},
+    drag::PressPosition,
+    player::{movement::GRAVITY, physics_bundles::PICKAXE_MASS},
 };
 use bevy::{camera::ViewportConversionError, prelude::*};
 

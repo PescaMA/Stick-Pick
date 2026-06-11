@@ -14,7 +14,8 @@ use winit::window::Icon;
 
 mod camera;
 
-pub mod level;
+pub mod drag;
+pub(crate) mod level;
 pub mod player;
 
 const SPRITE_SOURCE_PX: f32 = 16.0;
@@ -22,7 +23,7 @@ const SPRITE_TARGET_PX: f32 = 32.0;
 const SPRITE_SCALE: f32 = SPRITE_TARGET_PX / SPRITE_SOURCE_PX;
 
 pub fn plugin(app: &mut App) {
-    app.add_plugins((level::plugin, player::plugin, camera::plugin));
+    app.add_plugins((level::plugin, player::plugin, camera::plugin, drag::plugin));
 }
 
 fn set_window_icon(
@@ -70,7 +71,7 @@ fn main() -> AppExit {
             })
             .set(WindowPlugin {
                 primary_window: Window {
-                    title: "My Bevy App".to_string(),
+                    title: "Stick-Pick".to_string(),
                     fit_canvas_to_parent: true,
                     ..default()
                 }

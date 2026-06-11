@@ -1,7 +1,12 @@
 use avian2d::prelude::{Forces, WriteRigidBodyForces};
 use bevy::{color::palettes::css::WHITE, prelude::*};
 
-use crate::player::{drag_helper::*, movement::IgnoreSticky, physics_bundles::PlayerPartHitbox};
+use crate::{
+    drag::drag_helper::*,
+    player::{movement::IgnoreSticky, physics_bundles::PlayerPartHitbox},
+};
+
+pub mod drag_helper;
 
 const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
 const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
@@ -62,11 +67,16 @@ pub fn end_drag(
 
         let impulse_pos = press_pos.pos;
         let impulse_velocity = get_throw_distance(window, press_pos.into(), camera_query).unwrap();
+
+        if impulse_velocity.length() <= 0.0 {
+            return;
+        }
+
         for mut forces in &mut forces {
             forces.apply_linear_impulse_at_point(impulse_velocity, impulse_pos);
         }
         for mut player in player_sticky.iter_mut() {
-            player.time = Timer::from_seconds(0.05, TimerMode::Once);
+            player.reset();
         }
 
         info!("ACTRUALLY apply {} at {}", impulse_velocity, impulse_pos);

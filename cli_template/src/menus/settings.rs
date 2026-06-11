@@ -4,34 +4,44 @@
 
 use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude::*};
 
-use crate::{menus::Menu, screens::Screen, theme::prelude::*};
+use crate::{audio::SfxCooldown, menus::Menu, screens::Screen, theme::prelude::*};
+
+const MIN_VOLUME: f32 = 0.0;
+const MAX_VOLUME: f32 = 3.0;
+const VOLUME_CHANGE_PER_SEC: f32 = 2.0;
+
+enum VolumeType {
+    SFX,
+    Global,
+}
 
 #[derive(Resource)]
 struct VolumeTimer {
     timer: Timer,
     active: bool,
     volume_change: f32,
+    vol_type: VolumeType,
 }
 
 impl Default for VolumeTimer {
     fn default() -> Self {
         Self {
-            timer: Timer::from_seconds(VOLUME_CHANGE_PER_SEC / 10., TimerMode::Repeating),
+            timer: Timer::from_seconds(0.1 / VOLUME_CHANGE_PER_SEC, TimerMode::Repeating),
             active: false,
             volume_change: 0.,
+            vol_type: VolumeType::Global,
         }
     }
 }
 
 impl VolumeTimer {
-    fn reset(&mut self, change: f32) {
+    fn reset(&mut self, change: f32, vol_type: VolumeType) {
         self.timer.reset();
         self.active = true;
         self.volume_change = change;
+        self.vol_type = vol_type;
     }
 }
-
-const VOLUME_CHANGE_PER_SEC: f32 = 1.0;
 
 pub(super) fn plugin(app: &mut App) {
     app.insert_resource(VolumeTimer::default());
@@ -43,7 +53,12 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        (update_global_volume_label, hold_volume).run_if(in_state(Menu::Settings)),
+        (
+            update_global_volume_label,
+            update_sfx_volume_label,
+            hold_volume,
+        )
+            .run_if(in_state(Menu::Settings)),
     );
 }
 
@@ -79,6 +94,14 @@ fn settings_grid() -> impl Bundle {
                 }
             ),
             global_volume_widget(),
+            (
+                widget::label("SFX Volume"),
+                Node {
+                    justify_self: JustifySelf::End,
+                    ..default()
+                }
+            ),
+            sfx_volume_widget(),
         ],
     )
 }
@@ -106,15 +129,35 @@ fn global_volume_widget() -> impl Bundle {
     )
 }
 
-const MIN_VOLUME: f32 = 0.0;
-const MAX_VOLUME: f32 = 3.0;
+fn sfx_volume_widget() -> impl Bundle {
+    (
+        Name::new("SFX Volume Widget"),
+        Node {
+            justify_self: JustifySelf::Start,
+            ..default()
+        },
+        children![
+            widget::button_small("-", lower_sfx_volume),
+            (
+                Name::new("Current SFX Volume"),
+                Node {
+                    padding: UiRect::horizontal(px(10)),
+                    justify_content: JustifyContent::Center,
+                    ..default()
+                },
+                children![(widget::label(""), SFXVolumeLabel)],
+            ),
+            widget::button_small("+", raise_sfx_volume),
+        ],
+    )
+}
 
 fn lower_global_volume(
     _: On<Pointer<Press>>,
     mut global_volume: ResMut<GlobalVolume>,
     mut volume: ResMut<VolumeTimer>,
 ) {
-    volume.reset(-0.1);
+    volume.reset(-0.1, VolumeType::Global);
     let linear = (global_volume.volume.to_linear() - 0.1).max(MIN_VOLUME);
     global_volume.volume = Volume::Linear(linear);
 }
@@ -124,7 +167,27 @@ fn raise_global_volume(
     mut global_volume: ResMut<GlobalVolume>,
     mut volume: ResMut<VolumeTimer>,
 ) {
-    volume.reset(0.1);
+    volume.reset(0.1, VolumeType::Global);
+    let linear = (global_volume.volume.to_linear() + 0.1).max(MIN_VOLUME);
+    global_volume.volume = Volume::Linear(linear);
+}
+
+fn lower_sfx_volume(
+    _: On<Pointer<Press>>,
+    mut global_volume: ResMut<SfxCooldown>,
+    mut volume: ResMut<VolumeTimer>,
+) {
+    volume.reset(-0.1, VolumeType::SFX);
+    let linear = (global_volume.volume.to_linear() - 0.1).max(MIN_VOLUME);
+    global_volume.volume = Volume::Linear(linear);
+}
+
+fn raise_sfx_volume(
+    _: On<Pointer<Press>>,
+    mut global_volume: ResMut<SfxCooldown>,
+    mut volume: ResMut<VolumeTimer>,
+) {
+    volume.reset(0.1, VolumeType::SFX);
     let linear = (global_volume.volume.to_linear() + 0.1).min(MAX_VOLUME);
     global_volume.volume = Volume::Linear(linear);
 }
@@ -133,15 +196,27 @@ fn hold_volume(
     interactions: Query<&Interaction>,
     mut volume: ResMut<VolumeTimer>,
     mut global_volume: ResMut<GlobalVolume>,
+    mut sfx_volume: ResMut<SfxCooldown>,
     time: Res<Time>,
 ) {
     for interaction in interactions {
         match *interaction {
             Interaction::Pressed => {
                 if volume.timer.tick(time.delta()).just_finished() {
-                    let mut new_volume = global_volume.volume.to_linear() + volume.volume_change;
-                    new_volume = new_volume.min(MAX_VOLUME).max(MIN_VOLUME);
-                    global_volume.volume = Volume::Linear(new_volume);
+                    match volume.vol_type {
+                        VolumeType::SFX => {
+                            let mut new_volume =
+                                sfx_volume.volume.to_linear() + volume.volume_change;
+                            new_volume = new_volume.min(MAX_VOLUME).max(MIN_VOLUME);
+                            sfx_volume.volume = Volume::Linear(new_volume);
+                        }
+                        VolumeType::Global => {
+                            let mut new_volume =
+                                global_volume.volume.to_linear() + volume.volume_change;
+                            new_volume = new_volume.min(MAX_VOLUME).max(MIN_VOLUME);
+                            global_volume.volume = Volume::Linear(new_volume);
+                        }
+                    }
                 }
             }
             _ => {}
@@ -158,7 +233,19 @@ fn update_global_volume_label(
     mut label: Single<&mut Text, With<GlobalVolumeLabel>>,
 ) {
     let percent = 100.0 * global_volume.volume.to_linear();
-    label.0 = format!("{percent:3.0}%");
+    label.0 = format!("{percent:3.0}%"); // 0 digits after decimal, 3 total
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+struct SFXVolumeLabel;
+
+fn update_sfx_volume_label(
+    volume: Res<SfxCooldown>,
+    mut label: Single<&mut Text, With<SFXVolumeLabel>>,
+) {
+    let percent = 100.0 * volume.volume.to_linear();
+    label.0 = format!("{percent:3.0}%"); // 0 digits after decimal, 3 total
 }
 
 fn go_back_on_click(

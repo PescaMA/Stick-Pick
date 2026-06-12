@@ -62,7 +62,7 @@ impl Default for PlayerBundle {
             ignore_sticky: IgnoreSticky::default(),
             point_light: PointLight2d {
                 color: LIGHT_COLOR,
-                range: LIGHT_RANGE,
+                radius: LIGHT_RANGE,
                 intensity: LIGHT_INTENSITY,
                 ..default()
             },

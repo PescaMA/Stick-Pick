@@ -1000,9 +1000,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_firefly"
-version = "0.18.0"
+version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2144d44cbed9c3e4908e4d2a2f0730211f2369eabb3b0c7d04f440da8b7a7a70"
+checksum = "0bd68c4aeb209c63efcbec389be7f2babfd90490f888eaed01313d2fa1d9a282"
 dependencies = [
  "bevy",
  "bitflags 2.11.0",
@@ -3457,7 +3457,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.58.0",
+ "windows 0.61.3",
 ]
 
 [[package]]

@@ -7,6 +7,7 @@ use bevy_ecs_ldtk::{
     app::{LdtkEntityAppExt, LdtkIntCellAppExt},
     *,
 };
+use bevy_firefly::occluders::Occluder2d;
 
 use crate::{SPRITE_SOURCE_PX, player::Player};
 
@@ -55,6 +56,7 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) fn spawn_collider(walls: Query<Entity, Added<Wall>>, mut commands: Commands) {
     for wall in walls.iter() {
         commands.entity(wall).insert((
+            Occluder2d::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX).with_opacity(0.5),
             Collider::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX),
             RigidBody::Static,
             CollisionLayers::from_bits(1, 2),

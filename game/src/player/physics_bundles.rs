@@ -16,9 +16,9 @@ pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 
 const DAMPING_FACTOR: f32 = 0.5;
 const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
-const LIGHT_COLOR: Color = Color::srgb(0.556, 0.654, 0.238);
-const LIGHT_INTENSITY: f32 = 3.2;
-const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.;
+const LIGHT_COLOR: Color = Color::srgb_u8(169, 139, 84);
+const LIGHT_INTENSITY: f32 = 5.1;
+const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.5;
 
 const PICKHEAD_SIZE: Vec2 = Vec2::new(2., 12.);
 const PICKHANDLE_SIZE: Vec2 = Vec2::new(2., 16.);

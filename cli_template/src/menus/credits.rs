@@ -4,7 +4,7 @@ use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 use crate::{menus::Menu, theme::prelude::*};
 
 const HORIZONTAL_SIZE: f32 = 800.;
-const VERTICAL_SIZE: f32 = 400.;
+const VERTICAL_SIZE: f32 = 80.;
 
 pub fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Credits), spawn_credits_menu);
@@ -55,7 +55,7 @@ pub fn grid<const N: usize>(content: Vec<[&'static str; N]>) -> impl Bundle {
         Name::new("Grid"),
         Node {
             display: Display::Grid,
-            height: px(VERTICAL_SIZE),
+            height: px(VERTICAL_SIZE * content.len() as f32),
             overflow: Overflow::scroll(),
             row_gap: px(10),
             column_gap: px(10),

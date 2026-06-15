@@ -38,6 +38,7 @@ fn spawn_main_menu(mut commands: Commands) {
         DespawnOnExit(Menu::Main),
         #[cfg(not(target_family = "wasm"))]
         children![
+            widget::header("Stick Pick"),
             widget::button("Play", enter_loading_or_gameplay_screen),
             widget::button("Settings", open_settings_menu),
             widget::button("Credits", open_credits_menu),

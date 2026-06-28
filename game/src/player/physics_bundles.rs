@@ -1,6 +1,6 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use bevy_firefly::lights::PointLight2d;
+use bevy_firefly::lights::{LightHeight, PointLight2d};
 
 use crate::{
     SPRITE_SCALE,
@@ -46,6 +46,7 @@ pub struct PlayerBundle {
     pub screen_block: ScreenBlock,
     pub ignore_sticky: IgnoreSticky,
     pub point_light: PointLight2d,
+    pub light_height: LightHeight,
 }
 
 impl Default for PlayerBundle {
@@ -66,6 +67,7 @@ impl Default for PlayerBundle {
                 intensity: LIGHT_INTENSITY,
                 ..default()
             },
+            light_height: LightHeight(3.),
         }
     }
 }

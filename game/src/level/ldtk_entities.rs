@@ -7,7 +7,7 @@ use bevy_ecs_ldtk::{
     app::{LdtkEntityAppExt, LdtkIntCellAppExt},
     *,
 };
-use bevy_firefly::occluders::Occluder2d;
+use bevy_firefly::{occluders::Occluder2d, sprites::NormalMap};
 
 use crate::{SPRITE_SOURCE_PX, player::Player};
 
@@ -53,10 +53,15 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(Update, spawn_collider);
 }
 
-pub(crate) fn spawn_collider(walls: Query<Entity, Added<Wall>>, mut commands: Commands) {
+pub(crate) fn spawn_collider(
+    walls: Query<Entity, Added<Wall>>,
+    // asset_server: Res<AssetServer>,
+    mut commands: Commands,
+) {
     for wall in walls.iter() {
         commands.entity(wall).insert((
             Occluder2d::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX).with_opacity(0.5),
+            // NormalMap::from_file("level/crate_normal.png", &asset_server),
             Collider::rectangle(SPRITE_SOURCE_PX, SPRITE_SOURCE_PX),
             RigidBody::Static,
             CollisionLayers::from_bits(1, 2),

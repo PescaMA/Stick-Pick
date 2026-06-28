@@ -26,7 +26,10 @@ fn spawn_camera(mut commands: Commands) {
             ..OrthographicProjection::default_2d()
         }),
         Camera2d,
-        FireflyConfig::default(),
+        FireflyConfig {
+            normal_mode: NormalMode::TopDownY,
+            ..default()
+        },
         PhysicsPickingFilter::from_mask(2),
     ));
 }

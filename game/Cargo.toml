@@ -11,7 +11,7 @@ bevy_ecs_tilemap = { workspace = true }
 bevy_firefly = { workspace = true }
 
 cli_template = { version = "0.1.0", path = "../cli_template" }
-rand = "0.10.0"
+rand = "0.9.4"
 avian2d = "0.6.1"
 winit = "0.30.13"
 image = "0.25.10"

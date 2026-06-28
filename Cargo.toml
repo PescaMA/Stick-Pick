@@ -32,9 +32,9 @@ debug-assertions = false
 # Slows compile times, marginal improvements.
 codegen-units = 1
 
-# Do a second optimization pass over the entire program, including dependencies.
-# Slows compile times, marginal improvements.
-lto = "thin"
+# # Do a second optimization pass over the entire program, including dependencies.
+# # Slows compile times, marginal improvements.
+# lto = "thin"
 
 # This profile will be used by `bevy run web` automatically.
 [profile.web-release]

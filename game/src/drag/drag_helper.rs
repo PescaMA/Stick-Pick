@@ -9,7 +9,7 @@ use bevy::{camera::ViewportConversionError, prelude::*};
 const THROW_MAX_LENGTH: f32 = SPRITE_SOURCE_PX * 4.;
 pub const THROW_MIN_LENGTH: f32 = SPRITE_SOURCE_PX * 0.5;
 
-const THROW_MIN_SPEED: f32 = SPRITE_SOURCE_PX * 1.;
+const THROW_MIN_SPEED: f32 = SPRITE_SOURCE_PX * 0.1;
 const THROW_MAX_SPEED: f32 = SPRITE_SOURCE_PX * 7.;
 const THROW_BRACKET_COUNT: i32 = 6;
 
@@ -37,7 +37,7 @@ pub fn get_throw_discrete_distance(distance: f32) -> f32 {
 
 /// gets a [0,1] value and returns a [0,1] value. used for smoother throwing power
 fn speed_distribution(value: f32) -> f32 {
-    value
+    value * value
 }
 
 pub fn get_throw_speed(distance: f32) -> f32 {
@@ -96,4 +96,26 @@ pub fn get_throw_distance(
         GRAVITY * 2.0 * get_throw_speed(dist.length()) * dist.normalize_or_zero();
 
     return Ok(PICKAXE_MASS * velocity_squared.map(|c| c.abs().sqrt() * c.signum()));
+}
+
+#[test]
+fn test_discrete() {
+    let distance = THROW_MAX_LENGTH + 0.01;
+    let discrete_dist = get_throw_discrete_distance(distance);
+    assert!(distance >= discrete_dist);
+    assert!(distance - 0.01 == discrete_dist);
+}
+
+#[test]
+fn test_normalize() {
+    // should only work with bigger distance
+    let position = Vec2::new(10., THROW_MAX_LENGTH);
+    let distance = get_throw_discrete_distance(position.length());
+    let position_norm = normalize_throw_dir(position);
+    assert!((position_norm.length() - distance).abs() < 0.001);
+
+    let position = Vec2::new(3., 4.);
+    let distance = get_throw_discrete_distance(position.length());
+    let position_norm = normalize_throw_dir(position);
+    assert!((position_norm.length() - distance).abs() >= 0.001);
 }

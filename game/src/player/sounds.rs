@@ -2,7 +2,6 @@ use avian2d::collision::collider::CollidingEntities;
 use avian2d::prelude::*;
 use bevy::prelude::*;
 use cli_template::{PausableSystems, audio::sound_effect};
-use rand::seq::IndexedRandom;
 
 use crate::{
     drag::{PressPosition, drag_helper::get_throw_distance, end_drag},
@@ -78,7 +77,7 @@ fn add_collision_action(
     mut actions: Query<&mut PlayerActions>,
 ) {
     for (player, parent, colliding_entities) in head_collisions {
-        let Ok((linear_velocity, angular_velocity, ignore_sticky)) =
+        let Ok((linear_velocity, _angular_velocity, ignore_sticky)) =
             parent_stick.get_mut(parent.parent())
         else {
             break;
@@ -94,8 +93,8 @@ fn add_collision_action(
                 }
             }
 
-            info!("angular: {}", angular_velocity.0.abs().to_degrees());
-            info!("linear: {}", linear_velocity.length());
+            // info!("angular: {}", _angular_velocity.0.abs().to_degrees());
+            // info!("linear: {}", linear_velocity.length());
 
             if linear_velocity.length() < MIN_LINEAR_SPEED_FOR_SOUND {
                 continue;
@@ -104,7 +103,6 @@ fn add_collision_action(
             if non_sticky.get(*entity).is_ok() {
                 for mut action in &mut actions {
                     action.hit_non_sticky = true;
-                    info!("SOUND");
                 }
             }
         }
@@ -118,27 +116,17 @@ fn trigger_player_sounds(
 ) {
     for mut action in &mut actions {
         if action.is_thrown {
-            let rng = &mut rand::rng();
-            let random_throw = player_assets.throw_sound.choose(rng).unwrap().clone();
-            commands.spawn(sound_effect(random_throw));
+            commands.spawn(sound_effect(player_assets.get_random_throw_sound()));
 
             action.is_thrown = false;
         }
         if action.hit_sticky {
-            let rng = &mut rand::rng();
-            let sound = player_assets.hit_sticky_sound.choose(rng).unwrap().clone();
-            commands.spawn(sound_effect(sound));
+            commands.spawn(sound_effect(player_assets.get_random_sticky_sound()));
 
             action.hit_sticky = false;
         }
         if action.hit_non_sticky {
-            let rng = &mut rand::rng();
-            let sound = player_assets
-                .hit_non_sticky_sound
-                .choose(rng)
-                .unwrap()
-                .clone();
-            commands.spawn(sound_effect(sound));
+            commands.spawn(sound_effect(player_assets.get_random_non_sticky_sound()));
 
             action.hit_non_sticky = false;
         }

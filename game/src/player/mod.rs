@@ -11,6 +11,8 @@ pub mod physics;
 pub mod physics_bundles;
 pub mod sounds;
 
+use rand::seq::IndexedRandom;
+
 use crate::{
     AppSystems, PausableSystems, asset_tracking::LoadResource, player::movement::MovementController,
 };
@@ -74,6 +76,22 @@ pub struct PlayerAssets {
     pub throw_sound: Vec<Handle<AudioSource>>,
     pub hit_sticky_sound: Vec<Handle<AudioSource>>,
     pub hit_non_sticky_sound: Vec<Handle<AudioSource>>,
+}
+
+impl PlayerAssets {
+    fn get_random(source: Vec<Handle<AudioSource>>) -> Option<Handle<AudioSource>> {
+        let rng = &mut rand::rng();
+        source.choose(rng).cloned()
+    }
+    pub fn get_random_throw_sound(&self) -> Handle<AudioSource> {
+        Self::get_random(self.throw_sound.clone()).unwrap()
+    }
+    pub fn get_random_sticky_sound(&self) -> Handle<AudioSource> {
+        Self::get_random(self.hit_sticky_sound.clone()).unwrap()
+    }
+    pub fn get_random_non_sticky_sound(&self) -> Handle<AudioSource> {
+        Self::get_random(self.hit_non_sticky_sound.clone()).unwrap()
+    }
 }
 
 impl FromWorld for PlayerAssets {

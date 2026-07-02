@@ -1,15 +1,20 @@
-use avian2d::prelude::{Forces, WriteRigidBodyForces};
+use avian2d::{
+    dynamics::rigid_body::LinearVelocity,
+    prelude::{Forces, WriteRigidBodyForces},
+};
 use bevy::{color::palettes::css::WHITE, prelude::*};
 
 use crate::{
     drag::drag_helper::*,
-    player::{movement::IgnoreSticky, physics_bundles::PlayerPartHitbox},
+    player::{Player, movement::IgnoreSticky, physics_bundles::PlayerPartHitbox},
 };
 
 pub mod drag_helper;
 
 const COLOR_WEAK: Color = Color::linear_rgb(1., 0.1, 0.1);
 const COLOR_STRONG: Color = Color::linear_rgb(0.1, 0.9, 0.1);
+
+const MIN_DRAG_VELOCITY: f32 = 20.;
 
 #[derive(Resource, Default, Clone)]
 pub struct PressPosition {
@@ -43,9 +48,15 @@ fn cancel_drag(buttons: Res<ButtonInput<MouseButton>>, mut press_pos: ResMut<Pre
 
 fn start_drag(
     ev: On<Pointer<DragStart>>,
+    linear: Query<&LinearVelocity, With<Player>>,
     mut press_pos: ResMut<PressPosition>,
     camera_query: Single<(&Camera, &GlobalTransform)>,
 ) {
+    for velocity in linear {
+        if velocity.0.length() > MIN_DRAG_VELOCITY {
+            return;
+        }
+    }
     press_pos.pos = get_world2d_coords(ev.pointer_location.position, camera_query.clone()).unwrap();
     press_pos.currently_pressed = !press_pos.currently_pressed;
 }

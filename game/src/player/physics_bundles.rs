@@ -4,9 +4,11 @@ use bevy_firefly::lights::{LightHeight, PointLight2d};
 
 use crate::{
     SPRITE_SCALE,
+    level::ScreenBlock,
     player::{
         PLAYER_SPRITE_SIZE,
-        movement::{CustomDamping, IgnoreSticky, MovementController, ScreenBlock},
+        movement::{IgnoreSticky, MovementController},
+        physics::CustomDamping,
     },
 };
 
@@ -17,7 +19,7 @@ pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 const DAMPING_FACTOR_ANGULAR: f32 = 0.7;
 const ANGULAR_INERTIA_RESISTANCE: f32 = PICKAXE_MASS * 100.;
 const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
-const COLLISION_MARGIN: f32 = 0.2;
+const COLLISION_MARGIN: f32 = 4.0;
 
 const LIGHT_COLOR: Color = Color::srgb_u8(169, 139, 84);
 const LIGHT_INTENSITY: f32 = 5.1;

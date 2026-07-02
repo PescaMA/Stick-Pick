@@ -3,6 +3,23 @@ use bevy::prelude::*;
 
 use crate::player::{Player, movement::GRAVITY, physics_bundles::*};
 
+const DAMPING_FACTOR_LINEAR: [f32; 2] = [0.3, 0.1];
+
+#[derive(Component, Clone)]
+pub struct CustomDamping {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Default for CustomDamping {
+    fn default() -> Self {
+        Self {
+            x: DAMPING_FACTOR_LINEAR[0],
+            y: DAMPING_FACTOR_LINEAR[1],
+        }
+    }
+}
+
 pub(crate) fn plugin(app: &mut App) {
     app.insert_resource(Gravity(Vec2::new(0.0, GRAVITY)));
     app.add_plugins((PhysicsPlugins::default(), PhysicsDebugPlugin))
@@ -16,8 +33,26 @@ pub(crate) fn plugin(app: &mut App) {
                 ..default()
             },
         );
-    app.add_systems(Update, add_avian_body);
-    app.add_systems(Update, toggle_physics_gizmos);
+    app.add_systems(
+        Update,
+        (
+            add_avian_body,
+            toggle_physics_gizmos,
+            apply_directional_damping,
+        ),
+    );
+}
+
+fn apply_directional_damping(
+    mut query: Query<(&mut LinearVelocity, &CustomDamping)>,
+    time: Res<Time>,
+) {
+    let dt = time.delta_secs();
+
+    for (mut velocity, damping) in &mut query {
+        velocity.x *= (1.0 - damping.x * dt).max(0.0);
+        velocity.y *= (1.0 - damping.y * dt).max(0.0);
+    }
 }
 
 fn toggle_physics_gizmos(

@@ -2,6 +2,7 @@
 
 use crate::{asset_tracking::LoadResource, audio::music, player::Player, screens::Screen};
 
+use avian2d::dynamics::rigid_body::LinearVelocity;
 // use avian2d::prelude::CollisionLayers;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::{
@@ -39,7 +40,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins(ldtk_entities::plugin);
     app.load_resource::<LevelAssets>();
     app.add_systems(OnEnter(Screen::Gameplay), spawn_level);
-    app.add_systems(Update, print_lvl_bounds);
+    app.add_systems(Update, (print_lvl_bounds, apply_level_block));
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -108,4 +109,41 @@ pub fn print_lvl_bounds(
         }
     }
     Ok(())
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub struct ScreenBlock;
+
+fn apply_level_block(
+    mut wrap_query: Query<(&mut Transform, Option<&mut LinearVelocity>), With<ScreenBlock>>,
+    level_bound: Res<LevelBoundaries>,
+) {
+    /// for not getting stuck between edge and block
+    const EXTRA_PADDING: f32 = 3.5;
+
+    for (mut transform, velocity_opt) in &mut wrap_query {
+        let mut result = transform.translation.xy();
+        result.x = result.x.clamp(
+            level_bound.origin.x + EXTRA_PADDING,
+            level_bound.origin.x + level_bound.length.x - EXTRA_PADDING,
+        );
+
+        result.y = result.y.clamp(
+            level_bound.origin.y + EXTRA_PADDING,
+            level_bound.origin.y + level_bound.length.y - EXTRA_PADDING,
+        );
+
+        if let Some(mut vel) = velocity_opt {
+            // If clamp changed an axis, reset that component of linear velocity to zero.
+            if result.x != transform.translation.x {
+                vel.x = 0.0;
+            }
+            if result.y != transform.translation.y {
+                vel.y = 0.0;
+            }
+        }
+
+        transform.translation = result.extend(transform.translation.z);
+    }
 }

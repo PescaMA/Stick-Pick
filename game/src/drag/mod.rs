@@ -79,7 +79,7 @@ pub fn end_drag(
             player.reset();
         }
 
-        info!("ACTRUALLY apply {} at {}", impulse_velocity, impulse_pos);
+        // info!("ACTRUALLY apply {} at {}", impulse_velocity, impulse_pos);
     }
 }
 

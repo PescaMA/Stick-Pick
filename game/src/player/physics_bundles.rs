@@ -6,7 +6,7 @@ use crate::{
     SPRITE_SCALE,
     player::{
         PLAYER_SPRITE_SIZE,
-        movement::{IgnoreSticky, MovementController, ScreenBlock},
+        movement::{CustomDamping, IgnoreSticky, MovementController, ScreenBlock},
     },
 };
 
@@ -14,9 +14,10 @@ pub const HEAD_MASS: f32 = 2.;
 pub const HANDLE_MASS: f32 = 1.;
 pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 
-const DAMPING_FACTOR: f32 = 0.7;
+const DAMPING_FACTOR_ANGULAR: f32 = 0.7;
 const ANGULAR_INERTIA_RESISTANCE: f32 = PICKAXE_MASS * 100.;
 const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
+
 const LIGHT_COLOR: Color = Color::srgb_u8(169, 139, 84);
 const LIGHT_INTENSITY: f32 = 5.1;
 const LIGHT_RANGE: f32 = PLAYER_SPRITE_SIZE * SPRITE_SCALE * 3.5;
@@ -43,7 +44,7 @@ pub struct PlayerBundle {
     pub sleeping_disabled: SleepingDisabled,
     pub angular_damping: AngularDamping,
     //pub angular_inertia: AngularInertia,
-    pub linear_damping: LinearDamping,
+    pub linear_damping: CustomDamping,
     pub max_angular_speed: MaxAngularSpeed,
     pub screen_block: ScreenBlock,
     pub ignore_sticky: IgnoreSticky,
@@ -58,9 +59,9 @@ impl Default for PlayerBundle {
             movement_controller: MovementController { ..default() },
             rigid_body: RigidBody::Dynamic,
             sleeping_disabled: SleepingDisabled,
-            angular_damping: AngularDamping(DAMPING_FACTOR),
+            angular_damping: AngularDamping(DAMPING_FACTOR_ANGULAR),
             //angular_inertia: AngularInertia(ANGULAR_INERTIA_RESISTANCE),
-            linear_damping: LinearDamping(DAMPING_FACTOR),
+            linear_damping: CustomDamping::default(),
             max_angular_speed: MaxAngularSpeed(MAX_ANGULAR_SPEED_RADIANS),
             screen_block: ScreenBlock,
             ignore_sticky: IgnoreSticky::default(),

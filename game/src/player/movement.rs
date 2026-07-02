@@ -26,14 +26,32 @@ use crate::{
     player::{Player, physics_bundles::PlayerPart},
 };
 
+const DAMPING_FACTOR_LINEAR: [f32; 2] = [0.55, 0.1];
+
 pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;
-const GRAVITY_CAP: f32 = -25. * SPRITE_SOURCE_PX;
+const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
 
 #[derive(Component, Clone)]
 pub struct IgnoreSticky {
     pub time: Timer,
     pub has_hit_sticky: bool,
 }
+
+#[derive(Component, Clone)]
+pub struct CustomDamping {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl Default for CustomDamping {
+    fn default() -> Self {
+        Self {
+            x: DAMPING_FACTOR_LINEAR[0],
+            y: DAMPING_FACTOR_LINEAR[1],
+        }
+    }
+}
+
 impl IgnoreSticky {
     pub fn reset(&mut self) {
         self.time = Timer::from_seconds(0.05, TimerMode::Once);
@@ -58,7 +76,7 @@ pub(crate) fn plugin(app: &mut App) {
                 win,
                 apply_movement,
                 apply_level_block,
-                // collide_wall,
+                apply_directional_damping,
                 gravity_cap,
                 handle_sticky_collisions,
             )
@@ -137,11 +155,26 @@ fn apply_level_block(
     }
 }
 
+fn apply_directional_damping(
+    mut query: Query<(&mut LinearVelocity, &CustomDamping)>,
+    time: Res<Time>,
+) {
+    let dt = time.delta_secs();
+
+    for (mut velocity, damping) in &mut query {
+        velocity.x *= (1.0 - damping.x * dt).max(0.0);
+        velocity.y *= (1.0 - damping.y * dt).max(0.0);
+    }
+}
 fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
     let _ = time.delta_secs();
     for mut linear_velocity in &mut query {
         // Accelerate the entity towards +X at `2.0` units per second squared.
         linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP);
+
+        if linear_velocity.y != 0. {
+            info!("{}", linear_velocity.y);
+        }
     }
 }
 

@@ -17,13 +17,20 @@ mod camera;
 pub mod drag;
 pub(crate) mod level;
 pub mod player;
+// pub mod shake;
 
 const SPRITE_SOURCE_PX: f32 = 16.0;
 const SPRITE_TARGET_PX: f32 = 32.0;
 const SPRITE_SCALE: f32 = SPRITE_TARGET_PX / SPRITE_SOURCE_PX;
 
 pub fn plugin(app: &mut App) {
-    app.add_plugins((level::plugin, player::plugin, camera::plugin, drag::plugin));
+    app.add_plugins((
+        level::plugin,
+        player::plugin,
+        camera::plugin,
+        drag::plugin,
+        shake::plugin,
+    ));
 }
 
 fn set_window_icon(

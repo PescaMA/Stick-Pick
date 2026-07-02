@@ -7,7 +7,10 @@ use bevy::prelude::*;
 
 pub mod asset_tracking;
 pub mod audio;
+
+#[cfg(feature = "dev")]
 pub mod dev_tools;
+
 pub mod menus;
 pub mod screens;
 pub mod theme;

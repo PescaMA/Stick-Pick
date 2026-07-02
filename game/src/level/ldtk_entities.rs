@@ -7,7 +7,7 @@ use bevy_ecs_ldtk::{
     app::{LdtkEntityAppExt, LdtkIntCellAppExt},
     *,
 };
-use bevy_firefly::{occluders::Occluder2d, sprites::NormalMap};
+use bevy_firefly::occluders::Occluder2d;
 
 use crate::{SPRITE_SOURCE_PX, player::Player};
 
@@ -18,10 +18,15 @@ struct PlayerBundle {
     player: Player,
 }
 
+#[derive(Default, Component)]
+pub struct Goal;
+
 #[derive(Default, Bundle, LdtkEntity)]
 struct GoalBundle {
     #[sprite_sheet]
     sprite_sheet: Sprite,
+    wall: Wall,
+    goal: Goal,
 }
 
 #[derive(Default, Component)]

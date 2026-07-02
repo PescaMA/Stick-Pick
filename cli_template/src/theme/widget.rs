@@ -30,21 +30,29 @@ pub fn ui_root(name: impl Into<Cow<'static, str>>) -> impl Bundle {
 
 /// A simple header label. Bigger than [`label`].
 pub fn header(text: impl Into<String>) -> impl Bundle {
+    header_colored(text, HEADER_TEXT)
+}
+
+pub fn header_colored(text: impl Into<String>, color: impl Into<Color>) -> impl Bundle {
     (
         Name::new("Header"),
         Text(text.into()),
         TextFont::from_font_size(MENU_FONT_SIZE),
-        TextColor(HEADER_TEXT),
+        TextColor(color.into()),
     )
 }
 
 /// A simple text label.
 pub fn label(text: impl Into<String>) -> impl Bundle {
+    label_colored(text, LABEL_TEXT)
+}
+
+pub fn label_colored(text: impl Into<String>, color: impl Into<Color>) -> impl Bundle {
     (
         Name::new("Label"),
         Text(text.into()),
         TextFont::from_font_size(TEXT_FONT_SIZE),
-        TextColor(LABEL_TEXT),
+        TextColor(color.into()),
     )
 }
 

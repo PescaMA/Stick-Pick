@@ -35,7 +35,7 @@ pub fn get_throw_discrete_distance(distance: f32) -> f32 {
     THROW_MIN_LENGTH + get_throw_bracket_prc(distance) * (THROW_MAX_LENGTH - THROW_MIN_LENGTH)
 }
 
-/// gets a [0,1] value and returns a [0,1] value. used for smoother throwing power
+/// gets a 0..=1 value and returns a 0..=1 value. used for smoother throwing power
 fn speed_distribution(value: f32) -> f32 {
     value * value
 }

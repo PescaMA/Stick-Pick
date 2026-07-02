@@ -15,16 +15,19 @@
 
 use avian2d::prelude::*;
 use bevy::prelude::*;
-use cli_template::Pause;
+use cli_template::{Pause, menus::Menu};
 
 use crate::{
     AppSystems, PausableSystems, SPRITE_SOURCE_PX,
-    level::{LevelBoundaries, ldtk_entities::Sticky},
+    level::{
+        LevelBoundaries,
+        ldtk_entities::{Goal, Sticky},
+    },
     player::{Player, physics_bundles::PlayerPart},
 };
 
 pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;
-const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
+const GRAVITY_CAP: f32 = -25. * SPRITE_SOURCE_PX;
 
 #[derive(Component, Clone)]
 pub struct IgnoreSticky {
@@ -52,6 +55,7 @@ pub(crate) fn plugin(app: &mut App) {
         Update,
         (
             (
+                win,
                 apply_movement,
                 apply_level_block,
                 // collide_wall,
@@ -138,6 +142,21 @@ fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
     for mut linear_velocity in &mut query {
         // Accelerate the entity towards +X at `2.0` units per second squared.
         linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP);
+    }
+}
+
+pub(crate) fn win(
+    head_collisions: Query<&CollidingEntities, With<PlayerPart>>,
+    goals: Query<(), With<Goal>>,
+    mut next_menu: ResMut<NextState<Menu>>,
+) {
+    for collision in head_collisions {
+        for col_entity in collision.iter() {
+            if goals.get(*col_entity).is_ok() {
+                next_menu.set(Menu::Win);
+                return;
+            }
+        }
     }
 }
 

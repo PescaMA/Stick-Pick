@@ -10,11 +10,12 @@ use crate::{
     },
 };
 
-pub const HEAD_MASS: f32 = 200.;
-pub const HANDLE_MASS: f32 = 100.;
+pub const HEAD_MASS: f32 = 2.;
+pub const HANDLE_MASS: f32 = 1.;
 pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 
-const DAMPING_FACTOR: f32 = 0.5;
+const DAMPING_FACTOR: f32 = 0.7;
+const ANGULAR_INERTIA_RESISTANCE: f32 = PICKAXE_MASS * 100.;
 const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
 const LIGHT_COLOR: Color = Color::srgb_u8(169, 139, 84);
 const LIGHT_INTENSITY: f32 = 5.1;
@@ -41,6 +42,7 @@ pub struct PlayerBundle {
     pub rigid_body: RigidBody,
     pub sleeping_disabled: SleepingDisabled,
     pub angular_damping: AngularDamping,
+    //pub angular_inertia: AngularInertia,
     pub linear_damping: LinearDamping,
     pub max_angular_speed: MaxAngularSpeed,
     pub screen_block: ScreenBlock,
@@ -57,6 +59,7 @@ impl Default for PlayerBundle {
             rigid_body: RigidBody::Dynamic,
             sleeping_disabled: SleepingDisabled,
             angular_damping: AngularDamping(DAMPING_FACTOR),
+            //angular_inertia: AngularInertia(ANGULAR_INERTIA_RESISTANCE),
             linear_damping: LinearDamping(DAMPING_FACTOR),
             max_angular_speed: MaxAngularSpeed(MAX_ANGULAR_SPEED_RADIANS),
             screen_block: ScreenBlock,
@@ -81,6 +84,7 @@ pub struct CommonPlayerPartBundle {
     pub collision_layers: CollisionLayers,
     pub friction: Friction,
     pub pickable: Pickable,
+    pub angular_inertia: AngularInertia,
 }
 impl Default for CommonPlayerPartBundle {
     fn default() -> Self {
@@ -94,6 +98,7 @@ impl Default for CommonPlayerPartBundle {
             collision_layers: CollisionLayers::from_bits(2, 1), // we are in layer 2 and collide with layer 1
             friction: Friction::new(0.3),                       // friction with other colliders
             pickable: Pickable::IGNORE,
+            angular_inertia: AngularInertia(ANGULAR_INERTIA_RESISTANCE),
         }
     }
 }

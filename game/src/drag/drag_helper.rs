@@ -92,8 +92,10 @@ pub fn get_throw_distance(
 
     let dist = normalize_throw_dir(cursor - press_pos.pos);
 
-    let velocity_squared =
+    let mut velocity_squared =
         GRAVITY * 1.5 * get_throw_speed(dist.length()) * dist.normalize_or_zero();
+
+    velocity_squared.x *= 0.7;
 
     return Ok(PICKAXE_MASS * velocity_squared.map(|c| c.abs().sqrt() * c.signum()));
 }

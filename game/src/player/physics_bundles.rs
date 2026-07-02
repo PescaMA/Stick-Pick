@@ -17,6 +17,7 @@ pub const PICKAXE_MASS: f32 = HEAD_MASS + HANDLE_MASS;
 const DAMPING_FACTOR_ANGULAR: f32 = 0.7;
 const ANGULAR_INERTIA_RESISTANCE: f32 = PICKAXE_MASS * 100.;
 const MAX_ANGULAR_SPEED_RADIANS: f32 = 12.;
+const COLLISION_MARGIN: f32 = 0.2;
 
 const LIGHT_COLOR: Color = Color::srgb_u8(169, 139, 84);
 const LIGHT_INTENSITY: f32 = 5.1;
@@ -43,7 +44,7 @@ pub struct PlayerBundle {
     pub rigid_body: RigidBody,
     pub sleeping_disabled: SleepingDisabled,
     pub angular_damping: AngularDamping,
-    //pub angular_inertia: AngularInertia,
+    pub collision_margin: CollisionMargin,
     pub linear_damping: CustomDamping,
     pub max_angular_speed: MaxAngularSpeed,
     pub screen_block: ScreenBlock,
@@ -60,7 +61,7 @@ impl Default for PlayerBundle {
             rigid_body: RigidBody::Dynamic,
             sleeping_disabled: SleepingDisabled,
             angular_damping: AngularDamping(DAMPING_FACTOR_ANGULAR),
-            //angular_inertia: AngularInertia(ANGULAR_INERTIA_RESISTANCE),
+            collision_margin: CollisionMargin(COLLISION_MARGIN),
             linear_damping: CustomDamping::default(),
             max_angular_speed: MaxAngularSpeed(MAX_ANGULAR_SPEED_RADIANS),
             screen_block: ScreenBlock,

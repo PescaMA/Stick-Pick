@@ -14,7 +14,8 @@ use crate::{
     },
 };
 
-const MIN_SOUND_SPEED: f32 = 150.;
+const MIN_LINEAR_SPEED_FOR_SOUND: f32 = 30.;
+// const MIN_ANGULAR_SPEED_FOR_SOUND: f32 = 300.;
 
 #[derive(Component, Default)]
 pub struct PlayerActions {
@@ -93,15 +94,17 @@ fn add_collision_action(
                 }
             }
 
-            if linear_velocity.length() < MIN_SOUND_SPEED
-                && angular_velocity.0.abs().to_degrees() / 2.0 < MIN_SOUND_SPEED
-            {
+            info!("angular: {}", angular_velocity.0.abs().to_degrees());
+            info!("linear: {}", linear_velocity.length());
+
+            if linear_velocity.length() < MIN_LINEAR_SPEED_FOR_SOUND {
                 continue;
             }
 
             if non_sticky.get(*entity).is_ok() {
                 for mut action in &mut actions {
                     action.hit_non_sticky = true;
+                    info!("SOUND");
                 }
             }
         }

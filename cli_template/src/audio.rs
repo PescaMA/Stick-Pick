@@ -1,6 +1,6 @@
 use bevy::{audio::Volume, prelude::*};
 
-const SFX_COOLDOWN_SEC: f32 = 0.05;
+const SFX_COOLDOWN_SEC: f32 = 0.1;
 
 #[derive(Resource)]
 pub struct SfxCooldown {

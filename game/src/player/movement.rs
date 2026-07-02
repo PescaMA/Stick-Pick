@@ -26,10 +26,10 @@ use crate::{
     player::{Player, physics_bundles::PlayerPart},
 };
 
-const DAMPING_FACTOR_LINEAR: [f32; 2] = [0.55, 0.1];
+const DAMPING_FACTOR_LINEAR: [f32; 2] = [0.3, 0.1];
 
-pub const GRAVITY: f32 = -10. * SPRITE_SOURCE_PX;
-const GRAVITY_CAP: f32 = -15. * SPRITE_SOURCE_PX;
+pub const GRAVITY: f32 = -12. * SPRITE_SOURCE_PX;
+const GRAVITY_CAP: f32 = -20. * SPRITE_SOURCE_PX;
 
 #[derive(Component, Clone)]
 pub struct IgnoreSticky {
@@ -166,15 +166,9 @@ fn apply_directional_damping(
         velocity.y *= (1.0 - damping.y * dt).max(0.0);
     }
 }
-fn gravity_cap(mut query: Query<&mut LinearVelocity>, time: Res<Time>) {
-    let _ = time.delta_secs();
+fn gravity_cap(mut query: Query<&mut LinearVelocity>) {
     for mut linear_velocity in &mut query {
-        // Accelerate the entity towards +X at `2.0` units per second squared.
         linear_velocity.y = linear_velocity.y.max(GRAVITY_CAP);
-
-        if linear_velocity.y != 0. {
-            info!("{}", linear_velocity.y);
-        }
     }
 }
 

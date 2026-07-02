@@ -17,6 +17,7 @@ mod camera;
 pub mod drag;
 pub(crate) mod level;
 pub mod player;
+pub mod shake;
 
 const SPRITE_SOURCE_PX: f32 = 16.0;
 const SPRITE_TARGET_PX: f32 = 32.0;
@@ -28,6 +29,7 @@ pub fn plugin(app: &mut App) {
         player::plugin,
         camera::plugin,
         drag::plugin,
+        shake::plugin,
     ));
 }
 

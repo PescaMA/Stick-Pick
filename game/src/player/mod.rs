@@ -20,28 +20,44 @@ use crate::{
 const PLAYER_SPRITE_SIZE: f32 = 32.;
 pub const PLAYER_SPAWN_POSITION: Vec3 = vec3(100., 30., 1.);
 
-pub(super) fn plugin(app: &mut App) {
-    app.load_resource::<PlayerAssets>();
-
-    app.add_plugins((physics::plugin, movement::plugin, sounds::plugin));
-
-    // Record directional input as movement controls.
-    app.add_systems(
-        Update,
-        (record_player_directional_input,)
-            .in_set(AppSystems::RecordInput)
-            .in_set(PausableSystems),
-    );
+#[derive(Resource, Default)]
+struct Flight {
+    pub enabled: bool,
 }
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(Component)]
 pub struct Player;
 
+pub(super) fn plugin(app: &mut App) {
+    app.load_resource::<PlayerAssets>();
+    app.insert_resource(Flight::default());
+
+    app.add_plugins((physics::plugin, movement::plugin, sounds::plugin));
+
+    // Record directional input as movement controls.
+    app.add_systems(
+        Update,
+        (record_player_directional_input, toggle_flight)
+            .in_set(AppSystems::RecordInput)
+            .in_set(PausableSystems),
+    );
+}
+
+fn toggle_flight(mut flight: ResMut<Flight>, input: Res<ButtonInput<KeyCode>>) {
+    if input.pressed(KeyCode::ControlLeft) && input.just_pressed(KeyCode::KeyF) {
+        flight.enabled = !flight.enabled;
+    }
+}
+
 fn record_player_directional_input(
+    flight: Res<Flight>,
     input: Res<ButtonInput<KeyCode>>,
     mut controller_query: Query<&mut MovementController, With<Player>>,
 ) {
+    if !flight.enabled {
+        return;
+    }
     // Collect directional input.
     let mut intent = Vec2::ZERO;
     if input.pressed(KeyCode::KeyW) || input.pressed(KeyCode::ArrowUp) {
